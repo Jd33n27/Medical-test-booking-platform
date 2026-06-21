@@ -273,6 +273,14 @@ func SeedDB() {
 	log.Println("Seeding database...")
 
 	// Define Labs seed data
+	type SeedTest struct {
+		TestName        string
+		Description     string
+		PriceNaira      float64
+		TurnaroundHours int
+		SampleType      string
+	}
+
 	labs := []struct {
 		Name                  string
 		Address               string
@@ -282,16 +290,133 @@ func SeedDB() {
 		Latitude              float64
 		Longitude             float64
 		AcceptsHomeCollection bool
+		Tests                 []SeedTest
 	}{
-		{"Genesis Diagnostics", "123 Broad Street, Lagos Island", "Lagos", "Lagos", "+2348012345678", 6.4531, 3.3958, true},
-		{"Citywide Pathology", "45 Allen Avenue, Ikeja", "Lagos", "Lagos", "+2348023456789", 6.5962, 3.3516, false},
-		{"Trusted Medical Lab", "12 Constitution Hill, Wuse 2", "Abuja", "FCT", "+2348034567890", 9.0765, 7.4799, true},
-		{"HealthFirst Diagnostics", "78 Ring Road, Challenge", "Ibadan", "Oyo", "+2348045678901", 7.3775, 3.9470, false},
-		{"Central Lab Services", "10 Aba Road", "Port Harcourt", "Rivers", "+2348056789012", 4.8156, 7.0498, true},
+		{
+			"Genesis Diagnostics", "123 Broad Street, Lagos Island", "Lagos", "Lagos", "+2348012345678", 6.4531, 3.3958, true,
+			[]SeedTest{
+				{"Full Blood Count", "Counts all blood cell types, including red cells, white cells, and platelets. Essential for screening infections or anemia.", 5500.00, 24, "Blood"},
+				{"Malaria Parasite Smear", "Microscopic examination of blood smears to detect and identify Malaria parasites.", 3000.00, 4, "Blood"},
+				{"Typhoid Widal Test", "Agglutination test to detect antibodies against Salmonella typhi (Typhoid).", 4500.00, 2, "Blood"},
+			},
+		},
+		{
+			"Citywide Pathology", "45 Allen Avenue, Ikeja", "Lagos", "Lagos", "+2348023456789", 6.5962, 3.3516, false,
+			[]SeedTest{
+				{"Lipid Profile", "Measures cholesterol levels (HDL, LDL) and triglycerides in your blood to evaluate heart disease risk.", 8000.00, 24, "Blood"},
+				{"Liver Function Test", "Assesses enzymes and proteins (AST, ALT, Bilirubin) to evaluate liver health.", 12000.00, 24, "Blood"},
+				{"Urinalysis", "Chemical and microscopic analysis of urine to check for UTIs, diabetes, or kidney issues.", 2500.00, 2, "Urine"},
+			},
+		},
+		{
+			"Trusted Medical Lab", "12 Constitution Hill, Wuse 2", "Abuja", "FCT", "+2348034567890", 9.0765, 7.4799, true,
+			[]SeedTest{
+				{"Fasting Blood Sugar", "Measures glucose levels in your blood after fasting to screen for diabetes.", 2000.00, 4, "Blood"},
+				{"HbA1c (Glycated Hemoglobin)", "Measures average blood sugar levels over the past 3 months to monitor diabetes control.", 7500.00, 24, "Blood"},
+				{"Kidney Function Test", "Measures creatinine and urea to assess kidney filtration efficiency.", 15000.00, 24, "Blood"},
+			},
+		},
+		{
+			"HealthFirst Diagnostics", "78 Ring Road, Challenge", "Ibadan", "Oyo", "+2348045678901", 7.3775, 3.9470, false,
+			[]SeedTest{
+				{"Full Blood Count", "Counts red/white blood cells and platelets to screen for anemia and infection.", 5500.00, 24, "Blood"},
+				{"Pregnancy HCG Test", "Measures human chorionic gonadotropin in blood to confirm pregnancy.", 3500.00, 2, "Blood"},
+				{"Hepatitis B Screen", "Detects Hepatitis B surface antigen to screen for acute or chronic infection.", 6000.00, 24, "Blood"},
+			},
+		},
+		{
+			"Central Lab Services", "10 Aba Road", "Port Harcourt", "Rivers", "+2348056789012", 4.8156, 7.0498, true,
+			[]SeedTest{
+				{"Thyroid Function Panel", "Measures T3, T4, and TSH to evaluate thyroid gland activity and metabolism.", 16000.00, 48, "Blood"},
+				{"Electrolytes & Creatinine", "Measures sodium, potassium, and creatinine to check hydration and renal function.", 9000.00, 24, "Blood"},
+				{"HIV Screening Test", "Detects HIV antibodies and antigens to screen for infection.", 5000.00, 24, "Blood"},
+			},
+		},
+		{
+			"Kano Premier Diagnostics", "45 Zoo Road", "Kano", "Kano", "+2348061234567", 11.9876, 8.5321, true,
+			[]SeedTest{
+				{"Malaria Parasite Smear", "Microscopic examination of blood smears to detect and identify Malaria parasites.", 3000.00, 4, "Blood"},
+				{"Typhoid Widal Test", "Agglutination test to detect antibodies against Salmonella typhi (Typhoid).", 4000.00, 2, "Blood"},
+				{"Full Blood Count", "Counts red/white blood cells and platelets to screen for anemia and infection.", 5500.00, 24, "Blood"},
+			},
+		},
+		{
+			"Kaduna Scientific Labs", "12 Independence Way", "Kaduna", "Kaduna", "+2348072345678", 10.5186, 7.4208, false,
+			[]SeedTest{
+				{"Prostate Specific Antigen", "Measures PSA levels in blood to screen for prostate cancer or enlargement.", 10000.00, 24, "Blood"},
+				{"Fasting Blood Sugar", "Measures glucose levels in your blood after fasting to screen for diabetes.", 2000.00, 4, "Blood"},
+				{"Lipid Profile", "Measures cholesterol levels (HDL, LDL) and triglycerides in your blood to evaluate heart disease risk.", 8000.00, 24, "Blood"},
+			},
+		},
+		{
+			"Coal City Pathology", "8 Ogui Road", "Enugu", "Enugu", "+2348083456789", 6.4281, 7.4951, true,
+			[]SeedTest{
+				{"Basic Electrolyte Panel", "Checks sodium, potassium, and chloride levels for fluid balance.", 7000.00, 12, "Blood"},
+				{"Kidney Function Test", "Measures creatinine and urea to assess kidney filtration efficiency.", 14000.00, 24, "Blood"},
+				{"Liver Function Test", "Assesses enzymes and proteins (AST, ALT, Bilirubin) to evaluate liver health.", 11000.00, 24, "Blood"},
+			},
+		},
+		{
+			"Benin Medical Research Lab", "15 Airport Road", "Benin City", "Edo", "+2348094567890", 6.3350, 5.6269, false,
+			[]SeedTest{
+				{"Blood Culture & Sensitivity", "Detects bacteria or fungi in the blood to diagnose systemic infections.", 15000.00, 72, "Blood"},
+				{"Urine Culture & Sensitivity", "Detects and identifies bacteria in urine to diagnose UTIs and test antibiotic efficacy.", 6500.00, 48, "Urine"},
+				{"Malaria Parasite Smear", "Microscopic examination of blood smears to detect and identify Malaria parasites.", 3000.00, 4, "Blood"},
+			},
+		},
+		{
+			"Calabar Diagnostics Centre", "80 Marian Road", "Calabar", "Cross River", "+2348105678901", 4.9757, 8.3417, true,
+			[]SeedTest{
+				{"Vitamin D (25-Hydroxy)", "Measures vitamin D levels to assess bone health and immune function.", 25000.00, 48, "Blood"},
+				{"Lipid Profile", "Measures cholesterol levels (HDL, LDL) and triglycerides in your blood to evaluate heart disease risk.", 9000.00, 24, "Blood"},
+				{"Full Blood Count", "Counts all blood cell types, including red cells, white cells, and platelets.", 5500.00, 24, "Blood"},
+			},
+		},
+		{
+			"Akwa Ibom Diagnostic Hub", "102 Ikot Ekpene Road", "Uyo", "Akwa Ibom", "+2348116789012", 5.0333, 7.9266, true,
+			[]SeedTest{
+				{"Syphilis VDRL Screen", "Detects antibodies to screen for Syphilis infection.", 3000.00, 12, "Blood"},
+				{"Hepatitis C Antibody Screen", "Detects antibodies against the Hepatitis C virus in blood.", 7000.00, 24, "Blood"},
+				{"Full Blood Count", "Counts all blood cell types, including red cells, white cells, and platelets.", 5500.00, 24, "Blood"},
+			},
+		},
+		{
+			"Aba Clinical Laboratories", "15 Faulks Road", "Aba", "Abia", "+2348127890123", 5.1216, 7.3733, false,
+			[]SeedTest{
+				{"Typhoid Widal Test", "Agglutination test to detect antibodies against Salmonella typhi (Typhoid).", 4000.00, 2, "Blood"},
+				{"Blood Grouping & Genotype", "Determines ABO/Rhesus blood group and hemoglobin genotype (AA, AS, SS).", 5000.00, 4, "Blood"},
+				{"Urinalysis", "Chemical and microscopic analysis of urine to check for UTIs, diabetes, or kidney issues.", 2500.00, 2, "Urine"},
+			},
+		},
+		{
+			"Jos Highland Labs", "6 Yakubu Gowon Way", "Jos", "Plateau", "+2348138901234", 9.8965, 8.8583, true,
+			[]SeedTest{
+				{"Rheumatoid Factor (RF) Screen", "Detects RF antibodies associated with rheumatoid arthritis.", 8000.00, 24, "Blood"},
+				{"Serum Uric Acid", "Measures uric acid levels to diagnose gout or monitor kidney function.", 4500.00, 12, "Blood"},
+				{"Serum Calcium Level", "Measures calcium levels to screen for bone, kidney, or parathyroid conditions.", 5000.00, 24, "Blood"},
+			},
+		},
+		{
+			"Ilorin Wellness Diagnostics", "88 Taiwo Road", "Ilorin", "Kwara", "+2348149012345", 8.4799, 4.5418, false,
+			[]SeedTest{
+				{"Lipid Profile", "Measures cholesterol levels (HDL, LDL) and triglycerides in your blood to evaluate heart disease risk.", 8000.00, 24, "Blood"},
+				{"Thyroid TSH Screen", "Measures thyroid stimulating hormone to screen for thyroid disorders.", 7000.00, 24, "Blood"},
+				{"Fasting Blood Sugar", "Measures glucose levels in your blood after fasting to screen for diabetes.", 3000.00, 4, "Blood"},
+			},
+		},
+		{
+			"Abeokuta Pathology Services", "12 Lalubu Street", "Abeokuta", "Ogun", "+2348150123456", 7.1557, 3.3444, true,
+			[]SeedTest{
+				{"Packed Cell Volume (PCV)", "Measures percentage of blood volume occupied by red blood cells to check for anemia.", 2500.00, 2, "Blood"},
+				{"Fasting Blood Sugar", "Measures glucose levels in your blood after fasting to screen for diabetes.", 2000.00, 4, "Blood"},
+				{"Hepatitis B & C Combo Screen", "Dual screening for Hepatitis B and Hepatitis C virus infections.", 11000.00, 24, "Blood"},
+			},
+		},
 	}
 
 	// Insert Labs and keep track of IDs
 	labIDs := make([]string, 0)
+	testCount := 0
 	for _, l := range labs {
 		id := uuid.New().String()
 		query := `
@@ -302,40 +427,21 @@ func SeedDB() {
 			log.Fatalf("Failed to seed lab %s: %v", l.Name, err)
 		}
 		labIDs = append(labIDs, id)
-	}
 
-	log.Printf("Seeded %d labs successfully", len(labIDs))
-
-	// Define Tests seed data (to be added to EACH lab)
-	tests := []struct {
-		TestName        string
-		Description     string
-		PriceNaira      float64
-		TurnaroundHours int
-		SampleType      string
-	}{
-		{"Full Blood Count", "Counts all blood cell types, including red cells, white cells, and platelets. Essential for screening infections or anemia.", 5500.00, 24, "Blood"},
-		{"Lipid Profile", "Measures cholesterol levels (HDL, LDL) and triglycerides in your blood to evaluate heart disease risk.", 8000.00, 24, "Blood"},
-		{"Typhoid Test", "Detects antibodies against Salmonella typhi to diagnose Typhoid fever.", 4500.00, 2, "Blood"},
-	}
-
-	// Insert Tests for each Lab
-	testCount := 0
-	for _, labID := range labIDs {
-		for _, t := range tests {
-			id := uuid.New().String()
-			query := `
+		for _, t := range l.Tests {
+			testID := uuid.New().String()
+			testQuery := `
 				INSERT INTO tests (id, lab_id, test_name, description, price_naira, turnaround_hours, sample_type)
 				VALUES (?, ?, ?, ?, ?, ?, ?)`
-			_, err := DB.Exec(query, id, labID, t.TestName, t.Description, t.PriceNaira, t.TurnaroundHours, t.SampleType)
+			_, err := DB.Exec(testQuery, testID, id, t.TestName, t.Description, t.PriceNaira, t.TurnaroundHours, t.SampleType)
 			if err != nil {
-				log.Fatalf("Failed to seed test %s for lab %s: %v", t.TestName, labID, err)
+				log.Fatalf("Failed to seed test %s for lab %s: %v", t.TestName, l.Name, err)
 			}
 			testCount++
 		}
 	}
 
-	log.Printf("Seeded %d tests successfully (%d per lab)", testCount, len(tests))
+	log.Printf("Seeded %d labs and %d custom tests successfully", len(labIDs), testCount)
 
 	// Generate Time Slots: next 7 days, 3 slots per day (9 AM, 12 PM, 3 PM), capacity 10 each
 	slotCount := 0
