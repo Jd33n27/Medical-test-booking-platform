@@ -219,8 +219,8 @@ function App() {
               M
             </div>
             <div className="hidden sm:block">
-              <span className="font-extrabold text-lg md:text-xl tracking-tight text-brand-dark-text block">MedBook</span>
-              <span className="text-[9px] md:text-[10px] text-brand-muted-text font-semibold tracking-wider uppercase block -mt-1">Diagnostics</span>
+              <span className="font-extrabold text-xl md:text-2xl tracking-tight text-brand-dark-text block">MedBook</span>
+              <span className="text-[10px] md:text-xs text-brand-muted-text font-semibold tracking-wider uppercase block -mt-1">Diagnostics</span>
             </div>
           </button>
 
@@ -231,7 +231,7 @@ function App() {
                 {/* User Session Info (Desktop Only) */}
                 <div className="hidden md:flex flex-col items-end pr-2 text-right">
                   <div className="flex items-center gap-1">
-                    <span className="text-xs font-black text-brand-dark-text">{user.name}</span>
+                    <span className="text-sm font-black text-brand-dark-text">{user.name}</span>
                     {user.verification_status === 'verified' && (
                       <svg className="w-3.5 h-3.5 text-brand-terracotta shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <title>Verified Account</title>
@@ -239,19 +239,19 @@ function App() {
                       </svg>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-[9px] font-bold text-brand-muted-text uppercase tracking-widest leading-none">
+                  <div className="flex items-center gap-1 text-[10px] sm:text-xs font-bold text-brand-muted-text uppercase tracking-widest leading-none">
                     <span>{user.role.replace('_', ' ')}</span>
                     {user.role === 'lab_admin' && user.lab_name && (
                       <>
                         <span className="text-brand-border font-extrabold">•</span>
-                        <span className="text-brand-terracotta font-extrabold normal-case tracking-normal text-[10px]">{user.lab_name}</span>
+                        <span className="text-brand-terracotta font-extrabold normal-case tracking-normal text-[11px] sm:text-xs">{user.lab_name}</span>
                       </>
                     )}
                   </div>
                 </div>
                 <button
                   onClick={() => handleNavigateToChat()}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
                   title="Chat Messages"
                 >
                   <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -263,7 +263,7 @@ function App() {
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <button
                       onClick={() => navigateTo('lab-portal')}
-                      className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
+                      className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
                       title="Lab Portal"
                     >
                       <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -274,7 +274,7 @@ function App() {
                     {!user.lab_id && (
                       <button
                         onClick={() => navigateTo('onboard-lab')}
-                        className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
+                        className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
                         title="Onboard Lab"
                       >
                         <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -287,7 +287,7 @@ function App() {
                 ) : (
                   <button
                     onClick={() => navigateTo('history')}
-                    className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
+                    className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
                     title="My Vault"
                   >
                     <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -299,7 +299,7 @@ function App() {
                 
                 <button
                   onClick={() => navigateTo('profile')}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
                   title="Profile Settings"
                 >
                   <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -316,7 +316,7 @@ function App() {
                 
                 <button
                   onClick={handleLogout}
-                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl bg-rose-500/5 border border-rose-500/20 text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl bg-rose-500/5 border border-rose-500/20 text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center gap-1.5 cursor-pointer"
                   title="Sign Out"
                 >
                   <svg className="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -329,7 +329,7 @@ function App() {
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   onClick={() => navigateTo('onboard-lab')}
-                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors cursor-pointer flex items-center gap-1 shrink-0"
                   title="Onboard Lab"
                 >
                   <svg className="w-3.5 h-3.5 hidden sm:block text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -340,11 +340,11 @@ function App() {
                 </button>
                 <button
                   onClick={() => navigateTo('login')}
-                  className="px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text transition-colors cursor-pointer flex items-center gap-1"
                   title="Sign In"
                 >
                   <svg className="w-3.5 h-3.5 hidden sm:block text-brand-light-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 16l-4-4m0 0l-4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013 3h4a3 3 0 013 3v1" />
                   </svg>
                   <span>Sign In</span>
                 </button>
@@ -352,7 +352,7 @@ function App() {
             )}
 
             {/* Location Badge (Desktop Only) */}
-            <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] sm:text-xs bg-brand-panel-light border border-brand-border text-brand-dark-text font-medium select-none">
+            <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full text-xs sm:text-sm bg-brand-panel-light border border-brand-border text-brand-dark-text font-medium select-none">
               {locationLoading ? (
                 <span className="w-1.5 h-1.5 bg-brand-terracotta rounded-full animate-ping mr-1"></span>
               ) : (

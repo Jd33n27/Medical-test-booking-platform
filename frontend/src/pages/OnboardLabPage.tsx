@@ -452,9 +452,7 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-forest/5 blur-[120px] rounded-full pointer-events-none -z-10" />
       <div className="absolute top-1/3 left-1/3 w-60 h-60 bg-brand-terracotta/5 blur-[100px] rounded-full pointer-events-none -z-10" />
 
-      <div className="relative overflow-hidden rounded-3xl bento-panel-light p-5 sm:p-8 md:p-12">
-        {/* Glow border header indicator */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-terracotta/50 to-brand-forest/50" />
+      <div className="relative space-y-6 py-2 px-1">
 
         <div className="space-y-4 mb-8">
           <button
