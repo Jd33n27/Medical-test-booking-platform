@@ -72,10 +72,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
     const query = searchQuery.toLowerCase();
 
     const matchesLab = 
-      lab.name.toLowerCase().includes(query) ||
-      lab.city.toLowerCase().includes(query) ||
-      lab.state.toLowerCase().includes(query) ||
-      lab.address.toLowerCase().includes(query);
+      (lab.name || '').toLowerCase().includes(query) ||
+      (lab.city || '').toLowerCase().includes(query) ||
+      (lab.state || '').toLowerCase().includes(query) ||
+      (lab.address || '').toLowerCase().includes(query);
 
     const hasMatchingTest = tests.some(t => t.lab_id === lab.id);
 
