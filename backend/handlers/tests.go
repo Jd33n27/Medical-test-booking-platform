@@ -30,8 +30,9 @@ func GetTests(c fiber.Ctx) error {
 	}
 
 	if search != "" {
-		query += " AND t.test_name LIKE ?"
-		args = append(args, "%"+search+"%")
+		query += " AND (t.test_name LIKE ? OR t.description LIKE ? OR l.name LIKE ? OR l.city LIKE ? OR l.state LIKE ?)"
+		searchWildcard := "%" + search + "%"
+		args = append(args, searchWildcard, searchWildcard, searchWildcard, searchWildcard, searchWildcard)
 	}
 
 	query += " ORDER BY t.test_name ASC"

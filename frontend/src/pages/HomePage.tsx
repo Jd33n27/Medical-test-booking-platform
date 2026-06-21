@@ -103,11 +103,11 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
             
             {/* Search Box */}
             <div className="space-y-2">
-              <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider block">Search Tests</label>
+              <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider block">Search Tests & Labs</label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder="e.g. Typhoid, Blood Count..."
+                  placeholder="Search tests & labs..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-slate-800/80 text-white border border-slate-700/80 rounded-xl px-4 py-2.5 pl-10 focus:outline-none focus:border-emerald-500 transition-colors text-xs sm:text-sm"
