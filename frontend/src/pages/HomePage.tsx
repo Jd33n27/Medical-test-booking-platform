@@ -14,6 +14,57 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // Get user coordinates on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserCoords({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (err) => {
+          console.log('Error getting geolocation in HomePage:', err);
+        }
+      );
+    }
+  }, []);
+
+  // Distance calculator helper (Haversine formula in km)
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Radius of the earth in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2)
+      ; 
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+    return R * c; // Distance in km
+  };
+
+  // Sort labs dynamically based on proximity
+  const sortedLabs = [...labs].sort((a, b) => {
+    if (!userCoords) return a.name.localeCompare(b.name);
+    const distA = calculateDistance(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
+    const distB = calculateDistance(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
+    return distA - distB;
+  });
+
+  // Sort tests dynamically based on proximity of their offering labs
+  const sortedTests = [...tests].sort((a, b) => {
+    if (!userCoords) return a.test_name.localeCompare(b.test_name);
+    const labA = labs.find(l => l.id === a.lab_id);
+    const labB = labs.find(l => l.id === b.lab_id);
+    if (!labA || !labB) return 0;
+    const distA = calculateDistance(userCoords.latitude, userCoords.longitude, labA.latitude, labA.longitude);
+    const distB = calculateDistance(userCoords.latitude, userCoords.longitude, labB.latitude, labB.longitude);
+    return distA - distB;
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -132,7 +183,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
                 >
                   All Labs (Global)
                 </button>
-                {labs.map((lab) => (
+                {sortedLabs.map((lab) => (
                   <button
                     key={lab.id}
                     onClick={() => setSelectedLabId(lab.id)}
@@ -143,7 +194,12 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
                     }`}
                   >
                     <div className="font-semibold text-left">{lab.name}</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5 text-left">{lab.city}, {lab.state}</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5 text-left">{lab.address}, {lab.city}</div>
+                    {userCoords && (
+                      <div className="text-[10px] text-emerald-400 font-semibold mt-0.5 text-left">
+                        {calculateDistance(userCoords.latitude, userCoords.longitude, lab.latitude, lab.longitude).toFixed(1)} km away
+                      </div>
+                    )}
                   </button>
                 ))}
               </div>
@@ -179,7 +235,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {tests.map((test) => (
+              {sortedTests.map((test) => (
                 <div 
                   key={test.id} 
                   className="group relative flex flex-col justify-between p-6 rounded-2xl bg-slate-850 border border-slate-800 hover:border-slate-700 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/2"
@@ -210,6 +266,20 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
                       <div>
                         <span className="block text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Laboratory</span>
                         <span className="font-medium text-slate-200 mt-0.5 block">{test.lab_name}</span>
+                        {(() => {
+                          const lab = labs.find(l => l.id === test.lab_id);
+                          if (!lab) return null;
+                          return (
+                            <span className="text-[10px] text-slate-400 mt-0.5 block">
+                              {lab.address}, {lab.city}
+                              {userCoords && (
+                                <span className="text-emerald-400 font-semibold block mt-0.5">
+                                  {calculateDistance(userCoords.latitude, userCoords.longitude, lab.latitude, lab.longitude).toFixed(1)} km away
+                                </span>
+                              )}
+                            </span>
+                          );
+                        })()}
                       </div>
                       <div>
                         <span className="block text-slate-500 uppercase tracking-wider font-semibold text-[10px]">Turnaround Time</span>
