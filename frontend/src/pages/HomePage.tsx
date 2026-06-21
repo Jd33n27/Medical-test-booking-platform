@@ -66,6 +66,22 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
     return distA - distB;
   });
 
+  // Filter sorted labs dynamically based on search queries
+  const filteredSortedLabs = sortedLabs.filter(lab => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+
+    const matchesLab = 
+      lab.name.toLowerCase().includes(query) ||
+      lab.city.toLowerCase().includes(query) ||
+      lab.state.toLowerCase().includes(query) ||
+      lab.address.toLowerCase().includes(query);
+
+    const hasMatchingTest = tests.some(t => t.lab_id === lab.id);
+
+    return matchesLab || hasMatchingTest;
+  });
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -183,7 +199,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
                 >
                   All Labs (Global)
                 </button>
-                {sortedLabs.map((lab) => (
+                {filteredSortedLabs.map((lab) => (
                   <button
                     key={lab.id}
                     onClick={() => setSelectedLabId(lab.id)}
