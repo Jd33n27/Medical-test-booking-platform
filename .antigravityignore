@@ -1,0 +1,25 @@
+# Dependency Directories (Massive token drains)
+node_modules/
+vendor/
+
+# Frontend Build & Cache Outputs
+.next/
+out/
+build/
+dist/
+
+# Go Artifacts
+bin/
+obj/
+*.exe
+*.test
+
+# Environment & Secrets (Security best practice)
+.env
+.env.*
+*.pem
+
+# Git & Logs
+.git/
+*.log
+coverage/

@@ -1,0 +1,29 @@
+# Dependency Directories
+node_modules/
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Compile Outputs
+backend/api
+backend/api.exe
+frontend/dist/
+frontend/build/
+
+# Cache directories and temp files
+.next/
+.yarn/
+.pnpm-store/
+.npm/
+.eslintcache
+*.log
+.parcel-cache/
+.cache/
+
+# OS Files
+.DS_Store
+Thumbs.db
