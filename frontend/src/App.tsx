@@ -332,20 +332,21 @@ function App() {
                   className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1 shrink-0"
                   title="Onboard Lab"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                   <span className="hidden sm:inline">Onboard Lab</span>
+                  <span className="sm:hidden">Onboard</span>
                 </button>
                 <button
                   onClick={() => navigateTo('login')}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-955 transition-colors cursor-pointer flex items-center gap-1"
                   title="Sign In"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
-                  <span className="hidden sm:inline">Sign In</span>
+                  <span>Sign In</span>
                 </button>
               </div>
             )}

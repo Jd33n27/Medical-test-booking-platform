@@ -9,6 +9,7 @@ interface OnboardLabPageProps {
 }
 
 export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBack }) => {
+  const [step, setStep] = useState(1);
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
@@ -33,6 +34,36 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
+
+  const handleNextStep1 = () => {
+    if (!name.trim()) {
+      setError("Laboratory Name is required.");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Official Phone Number is required.");
+      return;
+    }
+    setError(null);
+    setStep(2);
+  };
+
+  const handleNextStep2 = () => {
+    if (!city.trim()) {
+      setError("City is required.");
+      return;
+    }
+    if (!address.trim()) {
+      setError("Street Address is required.");
+      return;
+    }
+    setError(null);
+    setStep(3);
+    // Trigger auto-geocoding in background so the map is positioned correctly when reaching Step 3
+    setTimeout(() => {
+      handleGeocodeAddress();
+    }, 150);
+  };
 
   // Initialize Map
   useEffect(() => {
@@ -139,6 +170,15 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
       }
     };
   }, []);
+
+  // Recalibrate Leaflet size when Step 3 becomes active
+  useEffect(() => {
+    if (mapRef.current && step === 3) {
+      setTimeout(() => {
+        mapRef.current?.invalidateSize();
+      }, 200);
+    }
+  }, [step]);
 
   // Sync map center and marker position when detectedCoords state is updated externally (GPS / Address Lookup)
   useEffect(() => {
@@ -435,6 +475,35 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
           </div>
         </div>
 
+        {/* Step Indicator Progress Bar */}
+        <div className="flex items-center justify-between mb-8 px-2 max-w-sm mx-auto">
+          {[1, 2, 3].map((s) => (
+            <React.Fragment key={s}>
+              <div className="flex items-center">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 border ${
+                  step === s 
+                    ? "bg-emerald-500 text-slate-950 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]" 
+                    : step > s 
+                      ? "bg-slate-800 text-emerald-400 border-slate-700" 
+                      : "bg-slate-950 text-slate-500 border-slate-900"
+                }`}>
+                  {step > s ? "✓" : s}
+                </div>
+                <span className={`text-[10px] font-bold tracking-wider uppercase ml-2 hidden sm:inline ${
+                  step === s ? "text-emerald-400" : "text-slate-550"
+                }`}>
+                  {s === 1 ? "Profile" : s === 2 ? "Address" : "Map Pin"}
+                </span>
+              </div>
+              {s < 3 && (
+                <div className={`flex-1 h-[2px] mx-2 ${
+                  step > s ? "bg-emerald-500/50" : "bg-slate-900"
+                }`} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
         {error && (
           <div className="p-4 mb-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-medium animate-shake">
             {error}
@@ -442,62 +511,19 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
+          
+          {/* STEP 1: Profile Info */}
+          <div className={step === 1 ? "space-y-5 animate-fade-in" : "hidden"}>
             {/* Lab Name */}
-            <div className="space-y-1.5 md:col-span-2">
+            <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Laboratory Name *</label>
               <input
                 type="text"
-                required
                 placeholder="e.g. Lancet Medical Diagnostics"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm animate-fadeIn"
-              />
-            </div>
-
-            {/* Address */}
-            <div className="space-y-1.5 md:col-span-2">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Street Address *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. 15 Kingsway Road, Ikoyi"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm animate-fadeIn"
-              />
-            </div>
-
-            {/* City */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">City *</label>
-              <input
-                type="text"
-                required
-                placeholder="e.g. Lagos Island"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
                 className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
-            </div>
-
-            {/* State Selection */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">State *</label>
-              <select
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-                className="w-full bg-slate-955 text-white border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
-              >
-                <option value="Lagos">Lagos</option>
-                <option value="Abuja">FCT (Abuja)</option>
-                <option value="Oyo">Oyo</option>
-                <option value="Rivers">Rivers</option>
-                <option value="Kano">Kano</option>
-                <option value="Enugu">Enugu</option>
-              </select>
             </div>
 
             {/* Phone Number */}
@@ -505,7 +531,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
               <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Official Phone Number *</label>
               <input
                 type="tel"
-                required
                 placeholder="e.g. +2348012345678"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -530,9 +555,55 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 />
               </button>
             </div>
+          </div>
 
-            {/* Geolocation Map Selector Section */}
-            <div className="space-y-4 md:col-span-2 p-5 bg-slate-950/40 border border-slate-800 rounded-2xl">
+          {/* STEP 2: Address Info */}
+          <div className={step === 2 ? "space-y-5 animate-fade-in" : "hidden"}>
+            {/* State Selection */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">State *</label>
+              <select
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                className="w-full bg-slate-955 text-white border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
+              >
+                <option value="Lagos">Lagos</option>
+                <option value="Abuja">FCT (Abuja)</option>
+                <option value="Oyo">Oyo</option>
+                <option value="Rivers">Rivers</option>
+                <option value="Kano">Kano</option>
+                <option value="Enugu">Enugu</option>
+              </select>
+            </div>
+
+            {/* City */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">City *</label>
+              <input
+                type="text"
+                placeholder="e.g. Lagos Island"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
+              />
+            </div>
+
+            {/* Address */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Street Address *</label>
+              <input
+                type="text"
+                placeholder="e.g. 15 Kingsway Road, Ikoyi"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm animate-fadeIn"
+              />
+            </div>
+          </div>
+
+          {/* STEP 3: Map Pinpoint */}
+          <div className={step === 3 ? "space-y-5 animate-fade-in" : "hidden"}>
+            <div className="space-y-4 p-4 bg-slate-955 border border-slate-800/80 rounded-2xl">
               
               {/* Autocomplete Input Search */}
               <div ref={autocompleteContainerRef} className="space-y-1.5 relative">
@@ -672,31 +743,73 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 }
               `}} />
             </div>
-
           </div>
 
+          {/* Action Navigation Buttons */}
           <div className="pt-4 border-t border-slate-800 flex gap-4">
-            <button
-              type="button"
-              onClick={onBack}
-              className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors cursor-pointer"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 relative overflow-hidden py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-55 text-slate-950 font-black rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
-            >
-              {loading ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                  Registering...
-                </div>
-              ) : (
-                'Onboard Lab Partner'
-              )}
-            </button>
+            {step === 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={onBack}
+                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextStep1}
+                  className="flex-1 py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs transition-all cursor-pointer"
+                >
+                  Next Step
+                </button>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setStep(1)}
+                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-350 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextStep2}
+                  className="flex-1 py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs transition-all cursor-pointer"
+                >
+                  Next Step
+                </button>
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setStep(2)}
+                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-350 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 relative overflow-hidden py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-55 text-slate-950 font-black rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                      Registering...
+                    </div>
+                  ) : (
+                    'Onboard Lab Partner'
+                  )}
+                </button>
+              </>
+            )}
           </div>
 
         </form>
