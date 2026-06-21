@@ -294,7 +294,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
   };
 
   return (
-    <div className="h-[calc(100vh-140px)] rounded-2xl bento-panel-light overflow-hidden flex flex-col md:flex-row shadow-sm">
+    <div className="h-[calc(100vh-140px)] flex flex-col md:flex-row md:rounded-2xl md:bento-panel-light overflow-hidden shadow-none md:shadow-sm">
       {/* Sidebar - Threads list */}
       <aside className={`w-full md:w-80 border-r border-brand-border flex flex-col h-full bg-brand-cream/60 ${activeThreadId ? 'hidden md:flex' : 'flex'}`}>
         {/* Sidebar Header */}
@@ -536,9 +536,9 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
                           )}
                         </div>
 
-                        {/* Options Menu Button (hover only) */}
+                        {/* Options Menu Button (hover on desktop, always visible on mobile) */}
                         {isOwn && !isDeleted && !isEditing && (
-                          <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                          <div className="absolute top-1 right-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity z-10">
                             <button
                               type="button"
                               onClick={(e) => {
