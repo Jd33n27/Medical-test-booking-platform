@@ -1,23 +1,43 @@
 @import "tailwindcss";
 
-/* Modern UI Design System Refinements */
+/* Bio-Organic Sanctuary Custom Design Tokens */
+@theme {
+  --color-brand-cream: #FAF7F2;
+  --color-brand-forest: #1A3026;
+  --color-brand-sage: #E8EFE9;
+  --color-brand-panel-light: #F3EFE7;
+  --color-brand-terracotta: #C86A51;
+  --color-brand-terracotta-hover: #B4573F;
+  --color-brand-dark-text: #14221D;
+  --color-brand-muted-text: #4A5F56;
+  --color-brand-light-text: #F7F5F0;
+  --color-brand-border: #DCD5CB;
+  --color-brand-border-dark: #2A4237;
+}
+
 @layer base {
   body {
-    background-color: #0f172a; /* Slate 900 for modern dark mode base */
-    color: #f8fafc; /* Slate 50 */
+    background-color: #FAF7F2; /* Warm sand/cream background */
+    color: #14221D; /* Forest-black text */
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
 
-/* Custom micro-animations & utilities */
-.glass-panel {
-  background: rgba(30, 41, 59, 0.7);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+/* Bento Box Layout Utility Classes */
+.bento-panel-light {
+  background-color: #F3EFE7;
+  border: 1px solid #DCD5CB;
+  color: #14221D;
+}
+
+.bento-panel-dark {
+  background-color: #1A3026;
+  border: 1px solid #2A4237;
+  color: #F7F5F0;
 }
 
 .gradient-text {
-  background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #1A3026 0%, #C86A51 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

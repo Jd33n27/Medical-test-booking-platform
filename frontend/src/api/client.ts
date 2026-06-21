@@ -4,7 +4,10 @@ import {
   User, LoginRequest, RegisterRequest, AuthResponse, BookingHistoryItem
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+    ? 'https://testbooking-api.onrender.com'
+    : 'http://localhost:5000');
 
 const client = axios.create({
   baseURL: API_BASE_URL,

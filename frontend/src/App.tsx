@@ -205,22 +205,22 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-emerald-500 selection:text-slate-950 flex flex-col justify-between">
+    <div className="min-h-screen bg-brand-cream text-brand-dark-text selection:bg-brand-terracotta selection:text-brand-light-text flex flex-col justify-between">
       
       {/* Header component */}
-      <header className="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-900 px-3 md:px-6 py-2.5 md:py-4">
+      <header className="sticky top-0 z-50 bg-brand-cream/90 backdrop-blur-md border-b border-brand-border px-3 md:px-6 py-2.5 md:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <button 
             onClick={() => navigateTo('home')}
             className="flex items-center gap-1.5 md:gap-2 hover:opacity-90 transition-opacity text-left"
           >
             {/* Logo Mark */}
-            <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-gradient-to-tr from-emerald-500 to-blue-500 flex items-center justify-center text-slate-950 font-black text-base md:text-lg">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl bg-brand-forest flex items-center justify-center text-brand-cream font-black text-base md:text-lg">
               M
             </div>
             <div className="hidden sm:block">
-              <span className="font-extrabold text-lg md:text-xl tracking-tight text-white block">MedBook</span>
-              <span className="text-[9px] md:text-[10px] text-slate-400 font-semibold tracking-wider uppercase block -mt-1">Diagnostics</span>
+              <span className="font-extrabold text-lg md:text-xl tracking-tight text-brand-dark-text block">MedBook</span>
+              <span className="text-[9px] md:text-[10px] text-brand-muted-text font-semibold tracking-wider uppercase block -mt-1">Diagnostics</span>
             </div>
           </button>
 
@@ -231,30 +231,30 @@ function App() {
                 {/* User Session Info (Desktop Only) */}
                 <div className="hidden md:flex flex-col items-end pr-2 text-right">
                   <div className="flex items-center gap-1">
-                    <span className="text-xs font-black text-white">{user.name}</span>
+                    <span className="text-xs font-black text-brand-dark-text">{user.name}</span>
                     {user.verification_status === 'verified' && (
-                      <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3.5 h-3.5 text-brand-terracotta shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <title>Verified Account</title>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
                       </svg>
                     )}
                   </div>
-                  <div className="flex items-center gap-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                  <div className="flex items-center gap-1 text-[9px] font-bold text-brand-muted-text uppercase tracking-widest leading-none">
                     <span>{user.role.replace('_', ' ')}</span>
                     {user.role === 'lab_admin' && user.lab_name && (
                       <>
-                        <span className="text-slate-600 font-extrabold">•</span>
-                        <span className="text-emerald-400/90 font-extrabold normal-case tracking-normal text-[10px]">{user.lab_name}</span>
+                        <span className="text-brand-border font-extrabold">•</span>
+                        <span className="text-brand-terracotta font-extrabold normal-case tracking-normal text-[10px]">{user.lab_name}</span>
                       </>
                     )}
                   </div>
                 </div>
                 <button
                   onClick={() => handleNavigateToChat()}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors flex items-center gap-1"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
                   title="Chat Messages"
                 >
-                  <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                   <span className="hidden sm:inline">Chat</span>
@@ -263,10 +263,10 @@ function App() {
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <button
                       onClick={() => navigateTo('lab-portal')}
-                      className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors flex items-center gap-1"
+                      className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
                       title="Lab Portal"
                     >
-                      <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
                       </svg>
                       <span className="hidden sm:inline">Portal</span>
@@ -274,10 +274,10 @@ function App() {
                     {!user.lab_id && (
                       <button
                         onClick={() => navigateTo('onboard-lab')}
-                        className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
+                        className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
                         title="Onboard Lab"
                       >
-                        <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                         <span className="hidden sm:inline">Onboard Lab</span>
@@ -287,10 +287,10 @@ function App() {
                 ) : (
                   <button
                     onClick={() => navigateTo('history')}
-                    className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors flex items-center gap-1"
+                    className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
                     title="My Vault"
                   >
-                    <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span className="hidden sm:inline">Vault</span>
@@ -299,15 +299,15 @@ function App() {
                 
                 <button
                   onClick={() => navigateTo('profile')}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
+                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
                   title="Profile Settings"
                 >
-                  <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="hidden sm:inline">Profile</span>
                   {user.verification_status === 'verified' && (
-                    <svg className="w-3 h-3 text-emerald-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3 h-3 text-brand-terracotta shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <title>Verified Account</title>
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
                     </svg>
@@ -316,10 +316,10 @@ function App() {
                 
                 <button
                   onClick={handleLogout}
-                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl bg-rose-500/5 border border-rose-500/20 text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center gap-1.5 cursor-pointer"
                   title="Sign Out"
                 >
-                  <svg className="w-3.5 h-3.5 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                   <span className="hidden sm:inline">Sign Out</span>
@@ -329,10 +329,10 @@ function App() {
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <button
                   onClick={() => navigateTo('onboard-lab')}
-                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-slate-900 border border-slate-800 text-emerald-400 hover:bg-slate-700 transition-colors cursor-pointer flex items-center gap-1 shrink-0"
+                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors cursor-pointer flex items-center gap-1 shrink-0"
                   title="Onboard Lab"
                 >
-                  <svg className="w-3.5 h-3.5 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 hidden sm:block text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                   </svg>
                   <span className="hidden sm:inline">Onboard Lab</span>
@@ -340,10 +340,10 @@ function App() {
                 </button>
                 <button
                   onClick={() => navigateTo('login')}
-                  className="px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-955 transition-colors cursor-pointer flex items-center gap-1"
+                  className="px-2.5 py-1.5 sm:px-4 sm:py-2 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text transition-colors cursor-pointer flex items-center gap-1"
                   title="Sign In"
                 >
-                  <svg className="w-3.5 h-3.5 hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3.5 h-3.5 hidden sm:block text-brand-light-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                   <span>Sign In</span>
@@ -352,11 +352,11 @@ function App() {
             )}
 
             {/* Location Badge (Desktop Only) */}
-            <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] sm:text-xs bg-slate-900 border border-slate-800 text-slate-300 font-medium select-none">
+            <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[10px] sm:text-xs bg-brand-panel-light border border-brand-border text-brand-dark-text font-medium select-none">
               {locationLoading ? (
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-ping mr-1"></span>
+                <span className="w-1.5 h-1.5 bg-brand-terracotta rounded-full animate-ping mr-1"></span>
               ) : (
-                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse mr-1"></span>
+                <span className="w-1.5 h-1.5 bg-brand-terracotta rounded-full animate-pulse mr-1"></span>
               )}
               {locationText}
             </div>
@@ -475,26 +475,26 @@ function App() {
       </main>
 
       {/* Footer component */}
-      <footer className="border-t border-slate-900/60 bg-slate-950 py-8 px-6 text-center text-xs text-slate-500 space-y-4">
+      <footer className="border-t border-brand-border-dark bg-brand-forest py-8 px-6 text-center text-xs text-brand-light-text/60 space-y-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="font-extrabold text-sm text-slate-400">MedBook</span>
+            <span className="font-extrabold text-sm text-brand-light-text">MedBook</span>
             <span>|</span>
             <span>© {new Date().getFullYear()} All rights reserved.</span>
           </div>
           
           <div className="flex gap-4">
-            <a href="#" className="hover:text-slate-300 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-brand-cream transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-brand-cream transition-colors">Privacy Policy</a>
             <button 
               onClick={() => navigateTo('onboard-lab')} 
-              className="hover:text-emerald-400 transition-colors cursor-pointer"
+              className="hover:text-brand-terracotta transition-colors cursor-pointer"
             >
               Lab Partners
             </button>
           </div>
         </div>
-        <p className="text-[10px] text-slate-600 max-w-xl mx-auto">
+        <p className="text-[10px] text-brand-muted-text/80 max-w-xl mx-auto">
           Disclaimer: MedBook is an independent booking intermediary. Diagnostic tests are conducted by third-party registered laboratories. We do not provide direct medical advice.
         </p>
       </footer>

@@ -88,7 +88,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
       {/* Back button */}
       <button 
         onClick={onBack}
-        className="inline-flex items-center gap-2 text-xs font-bold text-slate-400 hover:text-white transition-colors mb-6 cursor-pointer"
+        className="inline-flex items-center gap-2 text-xs font-bold text-brand-muted-text hover:text-brand-dark-text transition-colors mb-6 cursor-pointer"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -98,12 +98,12 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
 
       <div className="space-y-6">
         {/* Header section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 rounded-2xl bento-panel-light shadow-sm">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 font-extrabold text-xl relative shrink-0">
+            <div className="w-14 h-14 rounded-full bg-brand-sage flex items-center justify-center text-brand-forest font-extrabold text-xl relative shrink-0">
               {user.name.slice(0, 2).toUpperCase()}
               {isVerified && (
-                <span className="absolute -bottom-1 -right-1 bg-emerald-500 text-slate-955 p-0.5 rounded-full border-2 border-slate-900" title="Verified Account">
+                <span className="absolute -bottom-1 -right-1 bg-brand-forest text-brand-cream p-0.5 rounded-full border-2 border-brand-panel-light" title="Verified Account">
                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                   </svg>
@@ -112,34 +112,34 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl font-extrabold text-white leading-none">{user.name}</h1>
+                <h1 className="text-xl font-extrabold text-brand-dark-text leading-none">{user.name}</h1>
                 {isVerified ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 select-none">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-brand-forest/10 text-brand-forest border border-brand-forest/20 select-none">
                     Verified Partner
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-amber-500/10 text-amber-400 border border-amber-500/20 select-none animate-pulse">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-brand-terracotta/10 text-brand-terracotta border border-brand-terracotta/20 select-none animate-pulse">
                     Verification Required
                   </span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 capitalize">{user.role.replace('_', ' ')} Profile</p>
+              <p className="text-xs text-brand-muted-text capitalize">{user.role.replace('_', ' ')} Profile</p>
             </div>
           </div>
-          <div className="text-left sm:text-right text-[10px] text-slate-500">
+          <div className="text-left sm:text-right text-[10px] text-brand-muted-text/80">
             <div>Member since: {new Date(user.created_at).toLocaleDateString()}</div>
-            <div>Account ID: {user.id}</div>
+            <div>Account ID: <span className="font-mono text-brand-dark-text">{user.id}</span></div>
           </div>
         </div>
 
         {/* Profile Settings form */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-300">Basic Information</h2>
+        <div className="p-6 rounded-2xl bento-panel-light shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-brand-border/45 pb-3">
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark-text">Basic Information</h2>
             {!isEditing && (
               <button 
                 onClick={() => setIsEditing(true)}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-750 text-emerald-400 hover:text-emerald-300 font-bold rounded-lg text-xs cursor-pointer transition-colors"
+                className="px-3 py-1.5 bg-brand-sage hover:bg-brand-border/40 text-brand-forest font-bold rounded-lg border border-brand-border text-xs cursor-pointer transition-colors"
               >
                 Edit details
               </button>
@@ -147,13 +147,13 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
           </div>
 
           {editSuccess && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl">
+            <div className="p-3 bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs rounded-xl">
               Profile details updated successfully!
             </div>
           )}
 
           {editError && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-xl">
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
               {editError}
             </div>
           )}
@@ -161,29 +161,29 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
           <form onSubmit={handleUpdateProfile} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Full Name</label>
+                <label className="text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Full Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={!isEditing}
-                  className="w-full bg-slate-950 text-white placeholder:text-slate-750 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors text-sm disabled:opacity-50 disabled:bg-slate-900/30"
+                  className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/30 border border-brand-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-brand-terracotta transition-colors text-sm disabled:opacity-50"
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Email Address</label>
+                <label className="text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Email Address</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={!isEditing}
-                  className="w-full bg-slate-950 text-white placeholder:text-slate-755 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors text-sm disabled:opacity-50 disabled:bg-slate-900/30"
+                  className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/30 border border-brand-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-brand-terracotta transition-colors text-sm disabled:opacity-50"
                 />
               </div>
             </div>
 
             {isEditing && (
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-800/60">
+              <div className="flex justify-end gap-2 pt-2 border-t border-brand-border/40">
                 <button
                   type="button"
                   onClick={() => {
@@ -192,14 +192,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
                     setIsEditing(false);
                     setEditError(null);
                   }}
-                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs cursor-pointer transition-colors"
+                  className="px-3 py-2 bg-brand-sage hover:bg-brand-border/40 text-brand-forest border border-brand-border font-bold rounded-xl text-xs cursor-pointer transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={editLoading}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-950 font-bold rounded-xl text-xs cursor-pointer transition-all"
+                  className="px-4 py-2 bg-brand-forest hover:bg-brand-forest/90 text-brand-light-text font-bold rounded-xl text-xs cursor-pointer transition-all"
                 >
                   {editLoading ? 'Saving...' : 'Save Changes'}
                 </button>
@@ -210,25 +210,25 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
 
         {/* Laboratory Details section */}
         {user.role === 'lab_admin' && user.lab_id && (
-          <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md space-y-4">
-            <div className="border-b border-slate-800 pb-3">
-              <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-300">Onboarded Laboratory Details</h2>
+          <div className="p-6 rounded-2xl bento-panel-light shadow-sm space-y-4">
+            <div className="border-b border-brand-border/40 pb-3">
+              <h2 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark-text">Onboarded Laboratory Details</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Clinic Name</span>
-                <span className="text-sm font-bold text-slate-200 block">{user.lab_name || 'Loading clinic name...'}</span>
+                <span className="text-[10px] font-semibold text-brand-muted-text/80 uppercase tracking-wider block">Clinic Name</span>
+                <span className="text-sm font-bold text-brand-dark-text block">{user.lab_name || 'Loading clinic name...'}</span>
               </div>
               
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Official Phone</span>
-                <span className="text-sm font-bold text-slate-200 block">{user.lab_phone || 'N/A'}</span>
+                <span className="text-[10px] font-semibold text-brand-muted-text/80 uppercase tracking-wider block">Official Phone</span>
+                <span className="text-sm font-bold text-brand-dark-text block">{user.lab_phone || 'N/A'}</span>
               </div>
               
               <div className="md:col-span-2 space-y-1">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Registered Address</span>
-                <span className="text-sm text-slate-350 block leading-relaxed font-medium">
+                <span className="text-[10px] font-semibold text-brand-muted-text/80 uppercase tracking-wider block">Registered Address</span>
+                <span className="text-sm text-brand-muted-text block leading-relaxed font-medium">
                   {user.lab_address && `${user.lab_address}, `}
                   {user.lab_city && `${user.lab_city}, `}
                   {user.lab_state && `${user.lab_state}`}
@@ -237,8 +237,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
               </div>
               
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Geocoded Coordinates</span>
-                <span className="text-xs font-mono text-slate-400 block font-bold">
+                <span className="text-[10px] font-semibold text-brand-muted-text/80 uppercase tracking-wider block">Geocoded Coordinates</span>
+                <span className="text-xs font-mono text-brand-muted-text block font-bold">
                   {user.lab_latitude && user.lab_longitude ? (
                     `${user.lab_latitude.toFixed(6)}° N, ${user.lab_longitude.toFixed(6)}° E`
                   ) : (
@@ -248,9 +248,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider block">Sample Collection</span>
-                <span className={`inline-flex items-center gap-1.5 font-bold mt-1 text-[11px] ${user.lab_accepts_home_collection ? 'text-emerald-400' : 'text-slate-500'}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${user.lab_accepts_home_collection ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}`} />
+                <span className="text-[10px] font-semibold text-brand-muted-text/80 uppercase tracking-wider block">Sample Collection</span>
+                <span className={`inline-flex items-center gap-1.5 font-bold mt-1 text-[11px] ${user.lab_accepts_home_collection ? 'text-brand-forest' : 'text-brand-muted-text/70'}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${user.lab_accepts_home_collection ? 'bg-brand-forest animate-pulse' : 'bg-brand-border'}`} />
                   {user.lab_accepts_home_collection ? 'Accepts Home Sample Collection' : 'Walk-in Only'}
                 </span>
               </div>
@@ -259,33 +259,33 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
         )}
 
         {/* Verification section */}
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-md space-y-4">
-          <div className="border-b border-slate-800 pb-3">
-            <h2 className="text-sm font-extrabold uppercase tracking-wider text-slate-300">Identity & Verification</h2>
+        <div className="p-6 rounded-2xl bento-panel-light shadow-sm space-y-4">
+          <div className="border-b border-brand-border/40 pb-3">
+            <h2 className="text-sm font-extrabold uppercase tracking-wider text-brand-dark-text">Identity & Verification</h2>
           </div>
 
           {verifySuccess && (
-            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs rounded-xl">
+            <div className="p-3 bg-brand-forest/10 border border-brand-forest/20 text-brand-forest text-xs rounded-xl">
               Verification details approved successfully! Your account is now verified.
             </div>
           )}
 
           {verifyError && (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-xl">
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-xl">
               {verifyError}
             </div>
           )}
 
           {isVerified ? (
-            <div className="p-4 bg-emerald-500/5 border border-emerald-500/10 rounded-2xl flex items-start gap-3">
-              <span className="bg-emerald-500/10 p-1.5 rounded-xl border border-emerald-500/20 text-emerald-400">
+            <div className="p-4 bg-brand-forest/5 border border-brand-forest/10 rounded-2xl flex items-start gap-3">
+              <span className="bg-brand-forest/10 p-1.5 rounded-xl border border-brand-forest/20 text-brand-forest">
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </span>
               <div className="space-y-1">
-                <h3 className="text-xs font-bold text-white">Your Account is Verified</h3>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
+                <h3 className="text-xs font-bold text-brand-dark-text">Your Account is Verified</h3>
+                <p className="text-[11px] text-brand-muted-text leading-relaxed">
                   Thank you for verifying your profile. 
                   {user.role === 'patient' && ` Your NIN (${user.id_number}) is linked to your medical diagnostics logs.`}
                   {user.role === 'lab_admin' && ` Your laboratory license verification (${user.license_number}) has been approved.`}
@@ -294,7 +294,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
             </div>
           ) : (
             <form onSubmit={handleVerifyProfile} className="space-y-4">
-              <div className="p-4 bg-slate-950/40 border border-slate-800 rounded-2xl text-[11px] text-slate-400 leading-relaxed">
+              <div className="p-4 bg-brand-cream border border-brand-border rounded-2xl text-[11px] text-brand-muted-text leading-relaxed">
                 {user.role === 'patient' ? (
                   <span>
                     Please complete your identity verification by linking your National Identification Number (NIN). Linking your identity ensures that diagnostic test results are correctly aggregated in your secure vault.
@@ -308,33 +308,33 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ user, onUpdateUser, on
 
               {user.role === 'patient' ? (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">National ID / NIN Number</label>
+                  <label className="text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">National ID / NIN Number</label>
                   <input
                     type="text"
                     value={idNumber}
                     onChange={(e) => setIdNumber(e.target.value)}
                     placeholder="e.g. NIN-10293847"
-                    className="w-full bg-slate-950 text-white placeholder:text-slate-700 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors text-sm"
+                    className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/30 border border-brand-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-brand-terracotta transition-colors text-sm"
                   />
                 </div>
               ) : (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Medical Practice License Key</label>
+                  <label className="text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Medical Practice License Key</label>
                   <input
                     type="text"
                     value={licenseNumber}
                     onChange={(e) => setLicenseNumber(e.target.value)}
                     placeholder="e.g. MLSCN-87654"
-                    className="w-full bg-slate-950 text-white placeholder:text-slate-700 border border-slate-800 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors text-sm"
+                    className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/30 border border-brand-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-brand-terracotta transition-colors text-sm"
                   />
                 </div>
               )}
 
-              <div className="flex justify-end pt-2 border-t border-slate-800/60">
+              <div className="flex justify-end pt-2 border-t border-brand-border/40">
                 <button
                   type="submit"
                   disabled={verifyLoading}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-slate-955 font-bold rounded-xl text-xs cursor-pointer transition-all"
+                  className="px-4 py-2 bg-brand-forest hover:bg-brand-forest/90 disabled:opacity-50 text-brand-light-text font-bold rounded-xl text-xs cursor-pointer transition-all"
                 >
                   {verifyLoading ? 'Approving...' : 'Submit Verification'}
                 </button>

@@ -449,17 +449,17 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
   return (
     <div className="max-w-2xl mx-auto px-4 my-8 animate-fade-in">
       {/* Background glow highlights */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute top-1/3 left-1/3 w-60 h-60 bg-blue-500/10 blur-[100px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-forest/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-1/3 left-1/3 w-60 h-60 bg-brand-terracotta/5 blur-[100px] rounded-full pointer-events-none -z-10" />
 
-      <div className="relative overflow-hidden rounded-3xl bg-slate-900/40 backdrop-blur-xl border border-slate-800/80 p-5 sm:p-8 md:p-12 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bento-panel-light p-5 sm:p-8 md:p-12">
         {/* Glow border header indicator */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/50 to-blue-500/50" />
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-brand-terracotta/50 to-brand-forest/50" />
 
         <div className="space-y-4 mb-8">
           <button
             onClick={onBack}
-            className="flex items-center gap-1.5 text-xs font-bold text-slate-400 hover:text-emerald-400 transition-colors uppercase tracking-wider cursor-pointer"
+            className="flex items-center gap-1.5 text-xs font-bold text-brand-muted-text hover:text-brand-dark-text transition-colors uppercase tracking-wider cursor-pointer"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -467,9 +467,9 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
             Back to search
           </button>
           <div className="space-y-2">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest block">Partner Portal Enrollment</span>
-            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight">Onboard Your Lab</h2>
-            <p className="text-sm text-slate-400 leading-relaxed">
+            <span className="text-xs font-bold text-brand-terracotta uppercase tracking-widest block">Partner Portal Enrollment</span>
+            <h2 className="text-3xl md:text-4xl font-black text-brand-dark-text tracking-tight">Onboard Your Lab</h2>
+            <p className="text-sm text-brand-muted-text leading-relaxed">
               Register your laboratory profile to begin listing diagnostic tests, managing scheduling, and delivering PDF report results to patients across Nigeria.
             </p>
           </div>
@@ -482,22 +482,22 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 border ${
                   step === s 
-                    ? "bg-emerald-500 text-slate-950 border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.3)]" 
+                    ? "bg-brand-forest text-brand-cream border-brand-forest shadow-sm" 
                     : step > s 
-                      ? "bg-slate-800 text-emerald-400 border-slate-700" 
-                      : "bg-slate-950 text-slate-500 border-slate-900"
+                      ? "bg-brand-sage text-brand-forest border-brand-border" 
+                      : "bg-brand-cream text-brand-muted-text/50 border-brand-border"
                 }`}>
                   {step > s ? "✓" : s}
                 </div>
                 <span className={`text-[10px] font-bold tracking-wider uppercase ml-2 hidden sm:inline ${
-                  step === s ? "text-emerald-400" : "text-slate-550"
+                  step === s ? "text-brand-forest" : "text-brand-muted-text/60"
                 }`}>
                   {s === 1 ? "Profile" : s === 2 ? "Address" : "Map Pin"}
                 </span>
               </div>
               {s < 3 && (
                 <div className={`flex-1 h-[2px] mx-2 ${
-                  step > s ? "bg-emerald-500/50" : "bg-slate-900"
+                  step > s ? "bg-brand-forest/50" : "bg-brand-border"
                 }`} />
               )}
             </React.Fragment>
@@ -505,7 +505,7 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
         </div>
 
         {error && (
-          <div className="p-4 mb-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-medium animate-shake">
+          <div className="p-4 mb-6 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-medium animate-shake">
             {error}
           </div>
         )}
@@ -516,40 +516,40 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
           <div className={step === 1 ? "space-y-5 animate-fade-in" : "hidden"}>
             {/* Lab Name */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Laboratory Name *</label>
+              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Laboratory Name *</label>
               <input
                 type="text"
                 placeholder="e.g. Lancet Medical Diagnostics"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
+                className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
             </div>
 
             {/* Phone Number */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Official Phone Number *</label>
+              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Official Phone Number *</label>
               <input
                 type="tel"
                 placeholder="e.g. +2348012345678"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
+                className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
             </div>
 
             {/* Accepts Home Collection Switch */}
-            <div className="flex items-center justify-between p-4 bg-slate-950/40 border border-slate-800 rounded-2xl h-12 mt-1">
-              <span className="text-xs font-bold text-slate-300">Home sample collection</span>
+            <div className="flex items-center justify-between p-4 bg-brand-cream border border-brand-border rounded-2xl h-12 mt-1">
+              <span className="text-xs font-bold text-brand-dark-text">Home sample collection</span>
               <button
                 type="button"
                 onClick={() => setAcceptsHomeCollection(!acceptsHomeCollection)}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  acceptsHomeCollection ? 'bg-emerald-500' : 'bg-slate-800'
+                  acceptsHomeCollection ? 'bg-brand-forest' : 'bg-brand-border'
                 }`}
               >
                 <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-brand-cream shadow ring-0 transition duration-200 ease-in-out ${
                     acceptsHomeCollection ? 'translate-x-5' : 'translate-x-0'
                   }`}
                 />
@@ -561,11 +561,11 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
           <div className={step === 2 ? "space-y-5 animate-fade-in" : "hidden"}>
             {/* State Selection */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">State *</label>
+              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">State *</label>
               <select
                 value={state}
                 onChange={(e) => setState(e.target.value)}
-                className="w-full bg-slate-955 text-white border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
+                className="w-full bg-brand-cream text-brand-dark-text border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               >
                 <option value="Lagos">Lagos</option>
                 <option value="Abuja">FCT (Abuja)</option>
@@ -578,36 +578,36 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
             {/* City */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">City *</label>
+              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">City *</label>
               <input
                 type="text"
                 placeholder="e.g. Lagos Island"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
+                className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
             </div>
 
             {/* Address */}
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Street Address *</label>
+              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Street Address *</label>
               <input
                 type="text"
                 placeholder="e.g. 15 Kingsway Road, Ikoyi"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm animate-fadeIn"
+                className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
             </div>
           </div>
 
           {/* STEP 3: Map Pinpoint */}
           <div className={step === 3 ? "space-y-5 animate-fade-in" : "hidden"}>
-            <div className="space-y-4 p-4 bg-slate-955 border border-slate-800/80 rounded-2xl">
+            <div className="space-y-4 p-4 bg-brand-cream border border-brand-border rounded-2xl">
               
               {/* Autocomplete Input Search */}
               <div ref={autocompleteContainerRef} className="space-y-1.5 relative">
-                <label className="text-xs font-bold text-slate-350 uppercase tracking-wider block">Search & Auto-fill Location</label>
+                <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Search & Auto-fill Location</label>
                 <div className="relative">
                   <input
                     type="text"
@@ -615,13 +615,13 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                     value={searchQuery}
                     onChange={(e) => handleSearchInputChange(e.target.value)}
                     onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-                    className="w-full bg-slate-955 text-white placeholder:text-slate-600 border border-slate-800 focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 rounded-xl px-4 py-3 focus:outline-none transition-all text-sm pr-10"
+                    className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm pr-10"
                   />
                   <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                     {autocompleteLoading ? (
-                      <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-brand-terracotta border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <svg className="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className="w-4 h-4 text-brand-muted-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                       </svg>
                     )}
@@ -630,13 +630,13 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
                 {/* Suggestions Dropdown */}
                 {suggestions.length > 0 && showSuggestions && (
-                  <div className="absolute z-55 w-full mt-1.5 rounded-xl bg-slate-900 border border-slate-800 shadow-2xl overflow-hidden max-h-60 overflow-y-auto animate-fadeIn">
+                  <div className="absolute z-55 w-full mt-1.5 rounded-xl bg-brand-cream border border-brand-border shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
                     {suggestions.map((s, idx) => (
                       <button
                         key={idx}
                         type="button"
                         onClick={() => handleSelectSuggestion(s)}
-                        className="w-full text-left px-4 py-3 hover:bg-slate-800/80 text-xs text-slate-300 hover:text-white border-b border-slate-850/50 last:border-b-0 transition-colors block leading-relaxed cursor-pointer"
+                        className="w-full text-left px-4 py-3 hover:bg-brand-sage text-xs text-brand-dark-text hover:text-brand-forest border-b border-brand-border/40 last:border-b-0 transition-colors block leading-relaxed cursor-pointer"
                       >
                         {s.display_name}
                       </button>
@@ -645,10 +645,10 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 pt-2 border-t border-slate-850/40">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 pt-2 border-t border-brand-border/40">
                 <div>
-                  <label className="text-xs font-bold text-slate-350 uppercase tracking-wider block">Adjust Location Pin</label>
-                  <span className="text-[10.5px] text-slate-500 block mt-0.5">
+                  <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Adjust Location Pin</label>
+                  <span className="text-[10.5px] text-brand-muted-text/80 block mt-0.5">
                     Click the map or drag the pin to adjust your entrance; inputs will sync.
                   </span>
                 </div>
@@ -657,9 +657,9 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                   <button
                     type="button"
                     onClick={handleGeocodeAddress}
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-brand-sage hover:bg-brand-border/40 border border-brand-border text-brand-forest font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
                   >
-                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     Locate Address
@@ -667,9 +667,9 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                   <button
                     type="button"
                     onClick={handleDetectGPS}
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 text-slate-200 font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-brand-sage hover:bg-brand-border/40 border border-brand-border text-brand-forest font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
                   >
-                    <svg className="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -679,87 +679,87 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
               </div>
 
               {/* Map Container */}
-              <div className="relative rounded-xl overflow-hidden border border-slate-850 bg-slate-950/65 shadow-inner">
+              <div className="relative rounded-xl overflow-hidden border border-brand-border bg-brand-cream shadow-inner">
                 <div ref={mapContainerRef} style={{ height: '288px', width: '100%' }} className="w-full z-10" />
                 
                 {/* Geocoding / loading spinner overlay */}
                 {geocodingStatus === 'loading' && (
-                  <div className="absolute inset-0 z-30 bg-slate-950/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3">
-                    <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-xs font-bold text-slate-300 uppercase tracking-widest">Pinpointing Coordinates...</span>
+                  <div className="absolute inset-0 z-30 bg-brand-cream/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3">
+                    <div className="w-8 h-8 border-3 border-brand-terracotta border-t-transparent rounded-full animate-spin" />
+                    <span className="text-xs font-bold text-brand-dark-text uppercase tracking-widest">Pinpointing Coordinates...</span>
                   </div>
                 )}
               </div>
 
               {/* Mapped coords display badge */}
-              <div className="flex items-center justify-between text-xs py-1.5 px-3 bg-slate-900/60 rounded-xl border border-slate-850">
-                <span className="text-slate-400 font-semibold">Coordinates:</span>
-                <span className="font-mono text-slate-200">
+              <div className="flex items-center justify-between text-xs py-1.5 px-3 bg-brand-sage/40 rounded-xl border border-brand-border">
+                <span className="text-brand-muted-text font-semibold">Coordinates:</span>
+                <span className="font-mono text-brand-dark-text">
                   {detectedCoords ? (
-                    <span className="text-emerald-400 font-bold flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-emerald-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span className="text-brand-forest font-bold flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5 text-brand-forest shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
                       </svg>
                       {detectedCoords.lat.toFixed(6)}° N, {detectedCoords.lng.toFixed(6)}° E
                     </span>
                   ) : (
-                    <span className="text-slate-500 italic">No coordinates set (Lagos fallbacks)</span>
+                    <span className="text-brand-muted-text/60 italic">No coordinates set (Lagos fallbacks)</span>
                   )}
                 </span>
               </div>
 
-              {/* Custom Leaflet style overrides for dark theme */}
+              {/* Custom Leaflet style overrides for warm bio-organic theme */}
               <style dangerouslySetInnerHTML={{__html: `
                 .leaflet-bar {
-                  border: 1px solid rgb(30, 41, 59) !important;
+                  border: 1px solid #DCD5CB !important;
                   box-shadow: none !important;
                   border-radius: 8px !important;
                   overflow: hidden;
                 }
                 .leaflet-bar a {
-                  background-color: rgb(15, 23, 42) !important;
-                  color: rgb(248, 250, 252) !important;
-                  border-bottom: 1px solid rgb(30, 41, 59) !important;
+                  background-color: #F3EFE7 !important;
+                  color: #1A3026 !important;
+                  border-bottom: 1px solid #DCD5CB !important;
                   transition: all 0.2s;
                 }
                 .leaflet-bar a:hover {
-                  background-color: rgb(30, 41, 59) !important;
-                  color: rgb(16, 185, 129) !important;
+                  background-color: #E8EFE9 !important;
+                  color: #C86A51 !important;
                 }
                 .leaflet-container {
-                  background: rgb(3, 7, 18) !important;
+                  background: #FAF7F2 !important;
                   font-family: inherit;
                 }
                 .leaflet-control-attribution {
-                  background: rgba(15, 23, 42, 0.85) !important;
-                  color: rgb(100, 116, 139) !important;
+                  background: rgba(243, 239, 231, 0.85) !important;
+                  color: #4A5F56 !important;
                   font-size: 9px !important;
                   border-top-left-radius: 8px;
-                  border-left: 1px solid rgb(30, 41, 59);
-                  border-top: 1px solid rgb(30, 41, 59);
+                  border-left: 1px solid #DCD5CB;
+                  border-top: 1px solid #DCD5CB;
                 }
                 .leaflet-control-attribution a {
-                  color: rgb(16, 185, 129) !important;
+                  color: #C86A51 !important;
                 }
               `}} />
             </div>
           </div>
 
           {/* Action Navigation Buttons */}
-          <div className="pt-4 border-t border-slate-800 flex gap-4">
+          <div className="pt-4 border-t border-brand-border flex gap-4">
             {step === 1 && (
               <>
                 <button
                   type="button"
                   onClick={onBack}
-                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-brand-sage hover:bg-brand-border/40 text-brand-forest font-bold rounded-xl border border-brand-border text-xs transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleNextStep1}
-                  className="flex-1 py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs transition-all cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-brand-forest hover:bg-brand-forest/90 text-brand-cream font-black rounded-xl text-xs transition-all cursor-pointer"
                 >
                   Next Step
                 </button>
@@ -771,14 +771,14 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-350 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-brand-sage hover:bg-brand-border/40 text-brand-forest font-bold rounded-xl border border-brand-border text-xs transition-colors cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="button"
                   onClick={handleNextStep2}
-                  className="flex-1 py-3 px-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black rounded-xl text-xs transition-all cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-brand-forest hover:bg-brand-forest/90 text-brand-cream font-black rounded-xl text-xs transition-all cursor-pointer"
                 >
                   Next Step
                 </button>
@@ -790,18 +790,18 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 <button
                   type="button"
                   onClick={() => setStep(2)}
-                  className="flex-1 py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-350 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-brand-sage hover:bg-brand-border/40 text-brand-forest font-bold rounded-xl border border-brand-border text-xs transition-colors cursor-pointer"
                 >
                   Back
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 relative overflow-hidden py-3 px-4 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-55 text-slate-950 font-black rounded-xl text-xs transition-all shadow-lg shadow-emerald-500/10 cursor-pointer"
+                  className="flex-1 relative overflow-hidden py-3 px-4 bg-brand-terracotta hover:bg-brand-terracotta-hover disabled:opacity-55 text-brand-cream font-black rounded-xl text-xs transition-all shadow-sm cursor-pointer"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-brand-cream border-t-transparent rounded-full animate-spin" />
                       Registering...
                     </div>
                   ) : (

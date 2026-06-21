@@ -43,7 +43,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onToggleRegiste
       {/* Back button */}
       <button 
         onClick={onBack}
-        className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6 text-sm font-semibold"
+        className="flex items-center gap-2 text-brand-muted-text hover:text-brand-dark-text transition-colors mb-6 text-sm font-semibold cursor-pointer"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
@@ -51,25 +51,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onToggleRegiste
         Back to search
       </button>
 
-      <div className="p-6 md:p-8 rounded-2xl glass-panel space-y-6">
+      <div className="p-6 md:p-8 rounded-2xl bento-panel-light space-y-6">
         <div className="text-center space-y-2">
           {/* Logo Mark */}
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-blue-500 flex items-center justify-center text-slate-950 font-black text-2xl mx-auto shadow-lg shadow-emerald-500/10">
+          <div className="w-12 h-12 rounded-2xl bg-brand-forest flex items-center justify-center text-brand-cream font-black text-2xl mx-auto shadow-sm">
             M
           </div>
-          <h2 className="text-3xl font-extrabold text-white pt-2">Welcome Back</h2>
-          <p className="text-slate-400 text-sm">Sign in to manage your medical bookings and view diagnostic results</p>
+          <h2 className="text-3xl font-extrabold text-brand-dark-text pt-2">Welcome Back</h2>
+          <p className="text-brand-muted-text text-sm">Sign in to manage your medical bookings and view diagnostic results</p>
         </div>
 
         {error && (
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label htmlFor="email" className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Email Address</label>
+            <label htmlFor="email" className="text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Email Address</label>
             <input
               id="email"
               type="email"
@@ -77,12 +77,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onToggleRegiste
               placeholder="e.g. yourname@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-800/80 text-white border border-slate-700/80 rounded-xl px-4 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors text-sm"
+              className="w-full bg-brand-cream text-brand-dark-text border border-brand-border rounded-xl px-4 py-2.5 focus:outline-none focus:border-brand-terracotta transition-colors text-sm"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="password" className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">Password</label>
+            <label htmlFor="password" className="text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Password</label>
             <div className="relative">
               <input
                 id="password"
@@ -91,21 +91,20 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onToggleRegiste
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-800/80 text-white border border-slate-700/80 rounded-xl pl-4 pr-10 py-2.5 focus:outline-none focus:border-emerald-500 transition-colors text-sm"
+                className="w-full bg-brand-cream text-brand-dark-text border border-brand-border rounded-xl pl-4 pr-10 py-2.5 focus:outline-none focus:border-brand-terracotta transition-colors text-sm"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none cursor-pointer"
-                style={{ color: '#000000' }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none cursor-pointer text-brand-muted-text"
               >
                 {showPassword ? (
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20" style={{ fill: '#000000', color: '#000000' }}>
-                    <path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" />
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                    <path d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 01-2.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" />
                     <path d="M12.454 16.697L9.75 13.992a2.005 2.005 0 01-3.742-3.743L3.303 7.546A10.038 10.038 0 00.458 10c1.274 4.057 5.065 7 9.542 7a9.963 9.963 0 002.454-.303z" />
                   </svg>
                 ) : (
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20" style={{ fill: '#000000', color: '#000000' }}>
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
                     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                     <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
                   </svg>
@@ -117,22 +116,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onSuccess, onToggleRegiste
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5"
+            className="w-full bg-brand-forest hover:bg-brand-forest/90 text-brand-light-text font-bold py-3 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             {loading ? (
-              <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-brand-light-text border-t-transparent rounded-full animate-spin"></div>
             ) : (
               'Sign In'
             )}
           </button>
         </form>
 
-        <div className="text-center pt-2 text-sm text-slate-400">
+        <div className="text-center pt-2 text-sm text-brand-muted-text">
           Don't have an account?{' '}
           <button 
             type="button" 
             onClick={onToggleRegister}
-            className="text-emerald-400 font-bold hover:underline"
+            className="text-brand-terracotta font-bold hover:underline cursor-pointer"
           >
             Create an Account
           </button>
