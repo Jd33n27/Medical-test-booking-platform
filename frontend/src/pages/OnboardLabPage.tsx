@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 
 interface OnboardLabPageProps {
   onSuccess: (labId: string, token?: string) => void;
@@ -21,19 +19,13 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
   // States for coordinates geocoded in the background
   const [detectedCoords, setDetectedCoords] = useState<{lat: number, lng: number} | null>(null);
-  const [geocodingStatus, setGeocodingStatus] = useState<'idle' | 'loading' | 'success' | 'failed'>('idle');
 
   // Autocomplete search states
-  const [searchQuery, setSearchQuery] = useState('');
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [autocompleteLoading, setAutocompleteLoading] = useState(false);
   const searchTimeoutRef = useRef<any>(null);
   const autocompleteContainerRef = useRef<HTMLDivElement>(null);
-
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
 
   const handleNextStep1 = () => {
     if (!name.trim()) {
@@ -47,135 +39,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
     setError(null);
     setStep(2);
   };
-
-  // Initialize Map
-  useEffect(() => {
-    const container = mapContainerRef.current;
-    if (!container) return;
-
-    // Check if map is already initialized or has _leaflet_id
-    if (mapRef.current) {
-      try {
-        mapRef.current.remove();
-      } catch (e) {
-        console.warn("Cleanup map removal error:", e);
-      }
-      mapRef.current = null;
-    }
-
-    // Clean up container DOM properties and leftovers
-    if ((container as any)._leaflet_id) {
-      try {
-        delete (container as any)._leaflet_id;
-      } catch (e) {
-        (container as any)._leaflet_id = undefined;
-      }
-    }
-    container.innerHTML = '';
-
-    // Create map instance safely
-    let map: L.Map;
-    try {
-      const initialLat = detectedCoords?.lat ?? 6.4532;
-      const initialLng = detectedCoords?.lng ?? 3.3959;
-
-      map = L.map(container, {
-        center: [initialLat, initialLng],
-        zoom: detectedCoords ? 15 : 12,
-        zoomControl: true,
-      });
-
-      // Premium Dark Theme tiles (CartoDB Dark Matter) - standard format without `{r}`
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        maxZoom: 20
-      }).addTo(map);
-
-      // Custom glowing pulse marker icon
-      const customIcon = L.divIcon({
-        html: `
-          <div class="relative flex items-center justify-center">
-            <div class="absolute w-8 h-8 bg-emerald-500/30 rounded-full animate-ping"></div>
-            <div class="relative w-5 h-5 bg-emerald-500 border-2 border-slate-950 rounded-full flex items-center justify-center shadow-lg">
-              <div class="w-1.5 h-1.5 bg-slate-950 rounded-full"></div>
-            </div>
-          </div>
-        `,
-        className: 'custom-leaflet-marker',
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-      });
-
-      // Add draggable marker
-      const marker = L.marker([initialLat, initialLng], {
-        icon: customIcon,
-        draggable: true
-      }).addTo(map);
-
-      // Event listener: Drag marker
-      marker.on('dragend', async () => {
-        const position = marker.getLatLng();
-        setDetectedCoords({ lat: position.lat, lng: position.lng });
-        await reverseGeocodeRef.current(position.lat, position.lng);
-      });
-
-      // Event listener: Click map to place marker
-      map.on('click', async (e) => {
-        const { lat, lng } = e.latlng;
-        marker.setLatLng([lat, lng]);
-        setDetectedCoords({ lat, lng });
-        await reverseGeocodeRef.current(lat, lng);
-      });
-
-      mapRef.current = map;
-      markerRef.current = marker;
-
-      // Force recalculation of map container dimensions after rendering
-      setTimeout(() => {
-        if (mapRef.current) {
-          mapRef.current.invalidateSize();
-        }
-      }, 200);
-
-    } catch (err) {
-      console.error("Failed to initialize Leaflet map:", err);
-    }
-
-    return () => {
-      if (mapRef.current) {
-        try {
-          mapRef.current.remove();
-        } catch (e) {
-          console.warn("Cleanup map removal error on unmount:", e);
-        }
-        mapRef.current = null;
-        markerRef.current = null;
-      }
-    };
-  }, []);
-
-  // Recalibrate Leaflet size when Step 2 becomes active
-  useEffect(() => {
-    if (mapRef.current && step === 2) {
-      setTimeout(() => {
-        mapRef.current?.invalidateSize();
-      }, 200);
-    }
-  }, [step]);
-
-  // Sync map center and marker position when detectedCoords state is updated externally (GPS / Address Lookup)
-  useEffect(() => {
-    if (mapRef.current && markerRef.current && detectedCoords) {
-      const { lat, lng } = detectedCoords;
-      const currentLatLng = markerRef.current.getLatLng();
-      
-      // Update marker and pan map if coordinates changed significantly
-      if (Math.abs(currentLatLng.lat - lat) > 0.00001 || Math.abs(currentLatLng.lng - lng) > 0.00001) {
-        markerRef.current.setLatLng([lat, lng]);
-        mapRef.current.setView([lat, lng], 15);
-      }
-    }
-  }, [detectedCoords]);
 
   // Helper to parse address details returned by Nominatim API
   const parseNominatimAddress = (addressDetails: any) => {
@@ -202,39 +65,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
     return { streetAddress, city: cityVal, state: stateVal };
   };
 
-  // Reverse geocode to find address name from coordinates
-  const handleReverseGeocode = async (lat: number, lng: number) => {
-    try {
-      setGeocodingStatus('loading');
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        if (data && data.address) {
-          const { streetAddress, city: parsedCity, state: parsedState } = parseNominatimAddress(data.address);
-          
-          if (streetAddress) setAddress(streetAddress);
-          if (parsedCity) setCity(parsedCity);
-          if (parsedState) setState(parsedState);
-          
-          setSearchQuery(data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`);
-          setGeocodingStatus('success');
-        }
-      } else {
-        setGeocodingStatus('failed');
-      }
-    } catch (err) {
-      console.error("Reverse geocoding failed:", err);
-      setGeocodingStatus('failed');
-    }
-  };
-
-  const reverseGeocodeRef = useRef(handleReverseGeocode);
-  useEffect(() => {
-    reverseGeocodeRef.current = handleReverseGeocode;
-  });
-
   // Click outside autocomplete suggestions handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -253,7 +83,7 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
   // Handle search autocomplete typing search suggestion queries
   const handleSearchInputChange = (val: string) => {
-    setSearchQuery(val);
+    setAddress(val);
     if (!val.trim()) {
       setSuggestions([]);
       setShowSuggestions(false);
@@ -291,8 +121,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
     const lng = parseFloat(suggestion.lon);
     
     setDetectedCoords({ lat, lng });
-    setGeocodingStatus('success');
-    setSearchQuery(suggestion.display_name);
     setShowSuggestions(false);
 
     if (suggestion.address) {
@@ -300,74 +128,8 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
       setAddress(streetAddress || suggestion.display_name.split(',')[0]);
       if (parsedCity) setCity(parsedCity);
       if (parsedState) setState(parsedState);
-    }
-  };
-
-  // GPS coordinates fetch with reverse geocoding
-  const handleDetectGPS = () => {
-    if (navigator.geolocation) {
-      setGeocodingStatus('loading');
-      setError(null);
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          setDetectedCoords({ lat, lng });
-          await handleReverseGeocode(lat, lng);
-        },
-        (error) => {
-          console.error("GPS detection error:", error);
-          setGeocodingStatus('failed');
-          setError("Failed to acquire GPS location. Please ensure location permissions are enabled.");
-        }
-      );
     } else {
-      setError("Browser geolocation not supported.");
-    }
-  };
-
-  // Address search geocoding lookup
-  const handleGeocodeAddress = async () => {
-    if (!address.trim() || !city.trim()) {
-      setError('Please fill in Street Address and City first to search location coordinates.');
-      return;
-    }
-    
-    try {
-      setGeocodingStatus('loading');
-      setError(null);
-      
-      const query = encodeURIComponent(`${address}, ${city}, ${state}, Nigeria`);
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&limit=1`);
-      
-      if (!response.ok) throw new Error('Geocoding server error');
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        const lat = parseFloat(data[0].lat);
-        const lng = parseFloat(data[0].lon);
-        setDetectedCoords({ lat, lng });
-        setGeocodingStatus('success');
-        setSearchQuery(data[0].display_name);
-      } else {
-        // Fallback to city/state level query
-        const fallbackQuery = encodeURIComponent(`${city}, ${state}, Nigeria`);
-        const fbResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${fallbackQuery}&addressdetails=1&limit=1`);
-        const fbData = await fbResponse.json();
-        
-        if (fbData && fbData.length > 0) {
-          const lat = parseFloat(fbData[0].lat);
-          const lng = parseFloat(fbData[0].lon);
-          setDetectedCoords({ lat, lng });
-          setGeocodingStatus('success');
-          setSearchQuery(fbData[0].display_name);
-        } else {
-          setGeocodingStatus('failed');
-        }
-      }
-    } catch (err) {
-      console.error("Geocoding failed:", err);
-      setGeocodingStatus('failed');
+      setAddress(suggestion.display_name.split(',')[0]);
     }
   };
 
@@ -401,10 +163,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
     if (detectedCoords) {
       latVal = detectedCoords.lat;
       lngVal = detectedCoords.lng;
-    } else if (mapRef.current) {
-      const center = mapRef.current.getCenter();
-      latVal = center.lat;
-      lngVal = center.lng;
     } else {
       // Run quick synchronous search in submit if no lookup was run manually
       try {
@@ -559,6 +317,46 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
           {/* STEP 2: Address Info */}
           <div className={step === 2 ? "space-y-5 animate-fade-in" : "hidden"}>
+            {/* Street Address & Autocomplete Search */}
+            <div ref={autocompleteContainerRef} className="space-y-1.5 relative">
+              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Street Address *</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="e.g. 15 Kingsway Road, Ikoyi"
+                  value={address}
+                  onChange={(e) => handleSearchInputChange(e.target.value)}
+                  onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
+                  className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm pr-10"
+                />
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  {autocompleteLoading ? (
+                    <div className="w-4 h-4 border-2 border-brand-terracotta border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <svg className="w-4 h-4 text-brand-muted-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  )}
+                </div>
+              </div>
+
+              {/* Suggestions Dropdown */}
+              {suggestions.length > 0 && showSuggestions && (
+                <div className="absolute z-55 w-full mt-1.5 rounded-xl bg-brand-cream border border-brand-border shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+                  {suggestions.map((s, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => handleSelectSuggestion(s)}
+                      className="w-full text-left px-4 py-3 hover:bg-brand-sage text-xs text-brand-dark-text hover:text-brand-forest border-b border-brand-border/40 last:border-b-0 transition-colors block leading-relaxed cursor-pointer"
+                    >
+                      {s.display_name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* State Selection */}
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">State *</label>
@@ -586,143 +384,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
-            </div>
-
-            {/* Address */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Street Address *</label>
-              <input
-                type="text"
-                placeholder="e.g. 15 Kingsway Road, Ikoyi"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
-              />
-            </div>
-
-            {/* Map Pinpoint Components (Moved from Step 3) */}
-            <div className="space-y-4 p-4 bg-brand-cream border border-brand-border rounded-2xl">
-              
-              {/* Autocomplete Input Search */}
-              <div ref={autocompleteContainerRef} className="space-y-1.5 relative">
-                <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Search & Auto-fill Location</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Type address, street name, or clinic area in Nigeria..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearchInputChange(e.target.value)}
-                    onFocus={() => { if (suggestions.length > 0) setShowSuggestions(true); }}
-                    className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm pr-10"
-                  />
-                  <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                    {autocompleteLoading ? (
-                      <div className="w-4 h-4 border-2 border-brand-terracotta border-t-transparent rounded-full animate-spin" />
-                    ) : (
-                      <svg className="w-4 h-4 text-brand-muted-text" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-
-                {/* Suggestions Dropdown */}
-                {suggestions.length > 0 && showSuggestions && (
-                  <div className="absolute z-55 w-full mt-1.5 rounded-xl bg-brand-cream border border-brand-border shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
-                    {suggestions.map((s, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => handleSelectSuggestion(s)}
-                        className="w-full text-left px-4 py-3 hover:bg-brand-sage text-xs text-brand-dark-text hover:text-brand-forest border-b border-brand-border/40 last:border-b-0 transition-colors block leading-relaxed cursor-pointer"
-                      >
-                        {s.display_name}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2 pt-2 border-t border-brand-border/40">
-                <div>
-                  <label className="text-xs font-bold text-brand-muted-text uppercase tracking-wider block">Adjust Location Pin</label>
-                  <span className="text-[10.5px] text-brand-muted-text/80 block mt-0.5">
-                    Click the map or drag the pin to adjust your entrance; inputs will sync.
-                  </span>
-                </div>
-                
-                <div className="flex gap-2 shrink-0">
-                  <button
-                    type="button"
-                    onClick={handleGeocodeAddress}
-                    className="px-3 py-1.5 bg-brand-sage hover:bg-brand-border/40 border border-brand-border text-brand-forest font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                    Locate Address
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleDetectGPS}
-                    className="px-3 py-1.5 bg-brand-sage hover:bg-brand-border/40 border border-brand-border text-brand-forest font-bold text-xs rounded-xl transition-all cursor-pointer flex items-center gap-1.5"
-                  >
-                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Use GPS
-                  </button>
-                </div>
-              </div>
-
-              {/* Map Container */}
-              <div className="relative rounded-xl overflow-hidden border border-brand-border bg-brand-cream shadow-inner">
-                <div ref={mapContainerRef} style={{ height: '288px', width: '100%' }} className="w-full z-10" />
-                
-                {/* Geocoding / loading spinner overlay */}
-                {geocodingStatus === 'loading' && (
-                  <div className="absolute inset-0 z-30 bg-brand-cream/80 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3">
-                    <div className="w-8 h-8 border-3 border-brand-terracotta border-t-transparent rounded-full animate-spin" />
-                    <span className="text-xs font-bold text-brand-dark-text uppercase tracking-widest">Pinpointing Coordinates...</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Custom Leaflet style overrides for warm bio-organic theme */}
-              <style dangerouslySetInnerHTML={{__html: `
-                .leaflet-bar {
-                  border: 1px solid #DCD5CB !important;
-                  box-shadow: none !important;
-                  border-radius: 8px !important;
-                  overflow: hidden;
-                }
-                .leaflet-bar a {
-                  background-color: #F3EFE7 !important;
-                  color: #1A3026 !important;
-                  border-bottom: 1px solid #DCD5CB !important;
-                  transition: all 0.2s;
-                }
-                .leaflet-bar a:hover {
-                  background-color: #E8EFE9 !important;
-                  color: #C86A51 !important;
-                }
-                .leaflet-container {
-                  background: #FAF7F2 !important;
-                  font-family: inherit;
-                }
-                .leaflet-control-attribution {
-                  background: rgba(243, 239, 231, 0.85) !important;
-                  color: #4A5F56 !important;
-                  font-size: 9px !important;
-                  border-top-left-radius: 8px;
-                  border-left: 1px solid #DCD5CB;
-                  border-top: 1px solid #DCD5CB;
-                }
-                .leaflet-control-attribution a {
-                  color: #C86A51 !important;
-                }
-              `}} />
             </div>
           </div>
 
