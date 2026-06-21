@@ -48,23 +48,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
     setStep(2);
   };
 
-  const handleNextStep2 = () => {
-    if (!city.trim()) {
-      setError("City is required.");
-      return;
-    }
-    if (!address.trim()) {
-      setError("Street Address is required.");
-      return;
-    }
-    setError(null);
-    setStep(3);
-    // Trigger auto-geocoding in background so the map is positioned correctly when reaching Step 3
-    setTimeout(() => {
-      handleGeocodeAddress();
-    }, 150);
-  };
-
   // Initialize Map
   useEffect(() => {
     const container = mapContainerRef.current;
@@ -171,9 +154,9 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
     };
   }, []);
 
-  // Recalibrate Leaflet size when Step 3 becomes active
+  // Recalibrate Leaflet size when Step 2 becomes active
   useEffect(() => {
-    if (mapRef.current && step === 3) {
+    if (mapRef.current && step === 2) {
       setTimeout(() => {
         mapRef.current?.invalidateSize();
       }, 200);
@@ -390,8 +373,27 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+
+    // Validation
+    if (!name.trim()) {
+      setError("Laboratory Name is required.");
+      return;
+    }
+    if (!phone.trim()) {
+      setError("Official Phone Number is required.");
+      return;
+    }
+    if (!city.trim()) {
+      setError("City is required.");
+      return;
+    }
+    if (!address.trim()) {
+      setError("Street Address is required.");
+      return;
+    }
+
+    setLoading(true);
 
     let latVal = 6.4532;
     let lngVal = 3.3959;
@@ -475,7 +477,7 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
         {/* Step Indicator Progress Bar */}
         <div className="flex items-center justify-between mb-8 px-2 max-w-sm mx-auto">
-          {[1, 2, 3].map((s) => (
+          {[1, 2].map((s) => (
             <React.Fragment key={s}>
               <div className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all duration-300 border ${
@@ -490,10 +492,10 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 <span className={`text-[10px] font-bold tracking-wider uppercase ml-2 hidden sm:inline ${
                   step === s ? "text-brand-forest" : "text-brand-muted-text/60"
                 }`}>
-                  {s === 1 ? "Profile" : s === 2 ? "Address" : "Map Pin"}
+                  {s === 1 ? "Profile" : "Location"}
                 </span>
               </div>
-              {s < 3 && (
+              {s < 2 && (
                 <div className={`flex-1 h-[2px] mx-2 ${
                   step > s ? "bg-brand-forest/50" : "bg-brand-border"
                 }`} />
@@ -597,10 +599,8 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 className="w-full bg-brand-cream text-brand-dark-text placeholder:text-brand-muted-text/40 border border-brand-border focus:border-brand-terracotta rounded-xl px-4 py-3 focus:outline-none transition-all text-sm"
               />
             </div>
-          </div>
 
-          {/* STEP 3: Map Pinpoint */}
-          <div className={step === 3 ? "space-y-5 animate-fade-in" : "hidden"}>
+            {/* Map Pinpoint Components (Moved from Step 3) */}
             <div className="space-y-4 p-4 bg-brand-cream border border-brand-border rounded-2xl">
               
               {/* Autocomplete Input Search */}
@@ -689,23 +689,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 )}
               </div>
 
-              {/* Mapped coords display badge */}
-              <div className="flex items-center justify-between text-xs py-1.5 px-3 bg-brand-sage/40 rounded-xl border border-brand-border">
-                <span className="text-brand-muted-text font-semibold">Coordinates:</span>
-                <span className="font-mono text-brand-dark-text">
-                  {detectedCoords ? (
-                    <span className="text-brand-forest font-bold flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5 text-brand-forest shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {detectedCoords.lat.toFixed(6)}° N, {detectedCoords.lng.toFixed(6)}° E
-                    </span>
-                  ) : (
-                    <span className="text-brand-muted-text/60 italic">No coordinates set (Lagos fallbacks)</span>
-                  )}
-                </span>
-              </div>
-
               {/* Custom Leaflet style overrides for warm bio-organic theme */}
               <style dangerouslySetInnerHTML={{__html: `
                 .leaflet-bar {
@@ -769,25 +752,6 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 py-3 px-4 bg-brand-sage hover:bg-brand-border/40 text-brand-forest font-bold rounded-xl border border-brand-border text-xs transition-colors cursor-pointer"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleNextStep2}
-                  className="flex-1 py-3 px-4 bg-brand-forest hover:bg-brand-forest/90 text-brand-cream font-black rounded-xl text-xs transition-all cursor-pointer"
-                >
-                  Next Step
-                </button>
-              </>
-            )}
-
-            {step === 3 && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
                   className="flex-1 py-3 px-4 bg-brand-sage hover:bg-brand-border/40 text-brand-forest font-bold rounded-xl border border-brand-border text-xs transition-colors cursor-pointer"
                 >
                   Back
