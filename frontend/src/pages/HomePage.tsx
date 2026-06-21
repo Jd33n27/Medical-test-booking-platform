@@ -121,10 +121,10 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
             {/* Labs Select List */}
             <div className="space-y-2">
               <label className="text-[10px] sm:text-xs font-semibold text-slate-400 uppercase tracking-wider block">Laboratory</label>
-              <div className="flex flex-row overflow-x-auto gap-2 pb-2 lg:flex-col lg:space-y-2 lg:pb-0 scrollbar-none">
+              <div className="flex flex-row overflow-x-auto gap-2 pb-2 lg:flex-col lg:space-y-2 lg:pb-0 scrollbar-none w-full min-w-0">
                 <button
                   onClick={() => setSelectedLabId('')}
-                  className={`shrink-0 w-max lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 ${
+                  className={`shrink-0 min-w-max lg:min-w-0 lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 whitespace-nowrap lg:whitespace-normal ${
                     selectedLabId === ''
                       ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 font-semibold'
                       : 'bg-slate-800/40 border-slate-700/50 text-slate-300 hover:bg-slate-800/80'
@@ -136,7 +136,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest }) => {
                   <button
                     key={lab.id}
                     onClick={() => setSelectedLabId(lab.id)}
-                    className={`shrink-0 w-max lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 ${
+                    className={`shrink-0 min-w-max lg:min-w-0 lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 whitespace-nowrap lg:whitespace-normal ${
                       selectedLabId === lab.id
                         ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400 font-semibold'
                         : 'bg-slate-800/40 border-slate-700/50 text-slate-300 hover:bg-slate-800/80'
