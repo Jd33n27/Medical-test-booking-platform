@@ -44,6 +44,8 @@ func main() {
 	// Tests & Slots (Public catalog)
 	api.Get("/tests", handlers.GetTests)
 	api.Get("/tests/:test_id/slots", handlers.GetTestSlots)
+	api.Get("/health-concerns", handlers.GetHealthConcerns)
+
 
 	// Bookings & Payments (Core flow)
 	api.Post("/bookings", handlers.CreateBooking)

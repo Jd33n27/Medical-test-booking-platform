@@ -11,30 +11,37 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-// GetTests fetches all tests, optionally filtered by lab_id or search query
+// GetTests fetches all tests, optionally filtered by lab_id, search query, or health_concern_id
 func GetTests(c fiber.Ctx) error {
 	labID := c.Query("lab_id")
 	search := c.Query("search")
+	healthConcernID := c.Query("health_concern_id")
 
 	query := `
 		SELECT t.id, t.lab_id, t.test_name, t.description, t.price_naira, t.turnaround_hours, t.sample_type, t.created_at, l.name as lab_name
 		FROM tests t
 		JOIN labs l ON t.lab_id = l.id
-		WHERE 1=1
 	`
 	args := []interface{}{}
+	whereClauses := []string{"1=1"}
 
 	if labID != "" {
-		query += " AND t.lab_id = ?"
+		whereClauses = append(whereClauses, "t.lab_id = ?")
 		args = append(args, labID)
 	}
 
+	if healthConcernID != "" {
+		whereClauses = append(whereClauses, "t.id IN (SELECT test_id FROM test_health_concerns WHERE health_concern_id = ?)")
+		args = append(args, healthConcernID)
+	}
+
 	if search != "" {
-		query += " AND (t.test_name LIKE ? OR t.description LIKE ? OR t.sample_type LIKE ? OR l.name LIKE ? OR l.address LIKE ? OR l.city LIKE ? OR l.state LIKE ?)"
+		whereClauses = append(whereClauses, "(t.test_name LIKE ? OR t.description LIKE ? OR t.sample_type LIKE ? OR l.name LIKE ? OR l.address LIKE ? OR l.city LIKE ? OR l.state LIKE ?)")
 		searchWildcard := "%" + search + "%"
 		args = append(args, searchWildcard, searchWildcard, searchWildcard, searchWildcard, searchWildcard, searchWildcard, searchWildcard)
 	}
 
+	query += " WHERE " + strings.Join(whereClauses, " AND ")
 	query += " ORDER BY t.test_name ASC"
 
 	rows, err := db.DB.Query(query, args...)
@@ -211,4 +218,40 @@ func formatTimeLabel(slotTimeStr string) string {
 	}
 
 	return parsedTime.Format("3:04 PM")
+}
+
+// GetHealthConcerns returns a list of all health concerns
+func GetHealthConcerns(c fiber.Ctx) error {
+	rows, err := db.DB.Query("SELECT id, name, description, icon, created_at FROM health_concerns ORDER BY name ASC")
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success":   false,
+			"data":      nil,
+			"error":     fmt.Sprintf("Failed to fetch health concerns: %v", err),
+			"timestamp": time.Now().Format(time.RFC3339),
+		})
+	}
+	defer rows.Close()
+
+	concerns := []models.HealthConcern{}
+	for rows.Next() {
+		var hc models.HealthConcern
+		err := rows.Scan(&hc.ID, &hc.Name, &hc.Description, &hc.Icon, &hc.CreatedAt)
+		if err != nil {
+			return c.Status(500).JSON(fiber.Map{
+				"success":   false,
+				"data":      nil,
+				"error":     "Error parsing health concerns",
+				"timestamp": time.Now().Format(time.RFC3339),
+			})
+		}
+		concerns = append(concerns, hc)
+	}
+
+	return c.JSON(fiber.Map{
+		"success":   true,
+		"data":      concerns,
+		"error":     nil,
+		"timestamp": time.Now().Format(time.RFC3339),
+	})
 }

@@ -1,0 +1,222 @@
+﻿PRODUCT REQUIREMENT DOCUMENT
+Product Name: Lab Test                                                                                                                    Version: 1.0
+Date: 21/06/2026
+Executive Summary
+Accessing laboratory testing services in Nigeria is often inconvenient, time consuming, and lacks transparency. Patients typically have limited visibility into available laboratories, test pricing, appointment availability, and home sample collection services. Most diagnostic centers still require physical visits or phone calls before a test can be scheduled.
+The Lab Test is a healthcare booking platform that enables patients to discover, compare, and book laboratory tests online. Users can search for tests, compare prices across accredited laboratories, schedule appointments, request home sample collection, make payments, and receive digital results.
+The MVP focuses on simplifying the diagnostic testing journey while improving transparency, accessibility and convenience.
+Product Vision
+To become Nigeria's most trusted platform for discovering, comparing, and booking laboratory tests.
+Problem Statement
+Patients seeking laboratory testing services encounter several challenges:
+* Limited visibility into available laboratories and diagnostic centers.
+* Inconsistent and inaccessible pricing information.
+* Long wait times and multiple hospital visits before scheduling tests.
+* Difficulty finding laboratories offering home sample collection.
+* Delayed access to laboratory results.
+* Lack of a centralized platform for comparing available options.
+These challenges increase friction, delay diagnosis, and reduce access to healthcare services.
+Product Solution
+The Lab Test provides a centralized platform where users can:
+* Search for laboratory tests.
+* Compare prices across laboratories.
+* Discover nearby diagnostic centers.
+* Schedule appointments online.
+* Request home sample collection.
+* Make secure online payments.
+* Receive digital test results.
+The platform connects patients with accredited laboratories while making the booking process faster and more transparent.
+Product Overview
+The Lab Test is a web based healthcare marketplace that aggregates diagnostic laboratories and testing services.
+The platform allows users to:
+* Search for specific tests.
+* Compare laboratories based on price and location.
+* Book appointments online.
+* Request home sample collection.
+* Access test results digitally.
+The product prioritizes transparency, trust, and convenience.
+Product Goals
+Business Goals
+* Increase accessibility to laboratory services.
+* Improve laboratory visibility and booking volume.
+* Reduce administrative overhead for partner laboratories.
+* Establish a scalable healthcare marketplace.
+User Goals
+* Find laboratory tests quickly.
+* Compare prices before booking.
+* Schedule appointments without visiting hospitals.
+* Access results digitally.
+* Save time and reduce uncertainty.
+Target Users
+Primary Users
+* Working professionals.
+* Patients requiring routine tests.
+* Pregnant women.
+* Individuals managing chronic conditions.
+* Elderly patients.
+Secondary Users
+* Hospitals.
+* Diagnostic centers.
+* Independent laboratories.
+User Personas
+
+
+User
+	Traits & Behaviours 
+	Pain Points 
+	Goals 
+	Amina, 29, Working Professional 
+	Works a full time job, prefers digital services, values convenience and speed, often books appointments online. 
+	Limited time for hospital visits, difficulty comparing laboratory prices, long queues. 
+	Book tests quickly, compare prices easily, receive results digitally. 
+	Chinedu, 41, Chronic Disease Patient 
+	Requires regular diagnostic tests, frequently interacts with healthcare providers, values reliability and consistency. 
+	Repeated administrative processes, multiple visits required, difficulty tracking appointments. 
+	Access nearby laboratories easily, schedule recurring tests efficiently. 
+	Mrs. Adeyemi, 56, Elderly Patient 
+	Less comfortable with complex technology, prefers simple processes, has mobility limitations. 
+	Transportation challenges, long waiting times, difficulty navigating healthcare services. 
+	Request home sample collection, access healthcare conveniently. 
+	Dr. Bello, 38, Laboratory Manager 
+	Manages laboratory operations, monitors patient volume, seeks business growth opportunities. 
+	Limited online visibility, manual booking processes, inconsistent appointment management. 
+	Increase bookings, improve operational efficiency, attract more patients. 
+	Assumptions
+* Users have access to smartphones and internet connectivity.
+* Laboratories maintain updated pricing information.
+* Partner laboratories can accommodate digital bookings.
+* Users are comfortable receiving medical results electronically.
+* Initial launch targets major Nigerian cities.
+Constraints
+* Six week development timeline.
+* Limited engineering resources.
+* Limited access to healthcare integrations.
+* Regulatory requirements around patient data handling.
+* Limited number of laboratory partnerships during MVP.
+MVP Scope Definition
+In Scope
+Core Capabilities
+* Search laboratory tests.
+* Browse laboratory listings.
+* Compare pricing.
+* View laboratory details.
+* Schedule appointments.
+* Request home sample collection.
+* Online payment.
+* Booking confirmation.
+* Digital results access.
+User Stories
+Search
+As a patient, I want to search for a laboratory test so that I can find laboratories offering it.
+Comparison
+As a patient, I want to compare prices across laboratories so that I can choose an affordable option.
+Booking
+As a patient, I want to schedule an appointment so that I can avoid unnecessary waiting times.
+Home Collection
+As a patient, I want home sample collection so that I do not need to travel.
+Results
+As a patient, I want to access my test results online so that I can retrieve them anytime.
+Feature Prioritization
+MUST HAVE
+* Test search.
+* Laboratory listings.
+* Price comparison.
+* Appointment scheduling.
+* Home sample collection request.
+* Booking confirmation.
+* Results portal.
+SHOULD HAVE
+* Online payments.
+* Appointment reminders.
+* Booking history.
+COULD HAVE
+* Laboratory reviews.
+* Wait time estimates.
+* Insurance support.
+WON'T HAVE
+* Telemedicine consultations.
+* Doctor referrals.
+* AI assisted diagnosis.
+* Laboratory inventory management.
+User Flow
+Landing Page- Search Test- View Available Laboratories- Compare Prices- Select Laboratory- Choose Appointment Date & Time- Enter Patient Information- Confirm Booking- Receive Confirmation- Access Results
+Functional Requirements
+FR1 – Test Search
+* Search by test name.
+* Display relevant test results.
+* Support keyword search.
+FR2 – Laboratory Directory
+* Display accredited laboratories.
+* Display pricing information.
+* Display location information.
+FR3 – Price Comparison
+* Compare laboratories offering the same test.
+* Display pricing transparently.
+FR4 – Appointment Scheduling
+* Select appointment date.
+* Select appointment time.
+* Generate booking confirmation.
+FR5 – Home Sample Collection
+* Capture collection address.
+* Schedule collection date.
+* Notify laboratory.
+FR6 – Results Portal
+* View digital results.
+* Download results.
+* Maintain result history.
+Success Metrics
+North Star Metric
+Completed Laboratory Test Bookings
+Supporting Metrics
+* Search to booking conversion rate.
+* Appointment completion rate.
+* Home collection requests.
+* Result download rate.
+* Repeat booking rate.
+* Average booking completion time.
+MVP Targets
+* 60% complete a test search.
+* 40% compare at least two laboratories.
+* 25% complete a booking.
+* 80% access digital results.
+Value Proposition
+For Patients
+* Compare prices in one place.
+* Book appointments online.
+* Access home collection services.
+* Receive digital results.
+* Save time and reduce stress.
+For Laboratories
+* Increase online visibility.
+* Generate additional bookings.
+* Reduce manual scheduling.
+
+
+Unique Value Proposition
+"The easiest way to compare, book, and manage laboratory tests in Nigeria."
+Risks & Mitigation
+Risk
+	Impact
+	Mitigation
+	Inaccurate pricing 
+	High 
+	Routine verification process 
+	Low trust in laboratories 
+	High 
+	Accreditation badges 
+	Appointment fulfillment issues 
+	High 
+	Partner vetting 
+	Delayed result uploads 
+	Medium 
+	Automated reminders 
+	Data privacy concerns 
+	High 
+	Encryption and secure storage 
+	Low laboratory adoption 
+	Medium 
+	Pilot with selected partners 
+	Key Success Scenario
+A user searches for a Malaria Test, compares prices from multiple accredited laboratories, books an appointment within five minutes, completes the test, and receives digital results within 24 hours.
+ADDITIONAL RESOURCES
+DESIGN & ENGINEERING PRD

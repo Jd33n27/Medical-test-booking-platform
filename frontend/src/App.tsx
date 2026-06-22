@@ -12,9 +12,11 @@ import { LabPortalPage } from './pages/LabPortalPage';
 import { OnboardLabPage } from './pages/OnboardLabPage';
 import { ChatPage } from './pages/ChatPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { ConcernPage } from './pages/ConcernPage';
+import { StyleGuidePage } from './pages/StyleGuidePage';
 import { Test, TimeSlot, BookingRequest, User } from './types';
 
-type PageType = 'home' | 'booking' | 'confirm' | 'success' | 'failed' | 'login' | 'register' | 'history' | 'lab-portal' | 'onboard-lab' | 'chat' | 'profile';
+type PageType = 'home' | 'booking' | 'confirm' | 'success' | 'failed' | 'login' | 'register' | 'history' | 'lab-portal' | 'onboard-lab' | 'chat' | 'profile' | 'concern' | 'styleguide';
 
 function App() {
   const [page, setPage] = useState<PageType>('home');
@@ -24,6 +26,8 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [chatLabId, setChatLabId] = useState<string | undefined>(undefined);
   const [chatPatientId, setChatPatientId] = useState<string | undefined>(undefined);
+  const [selectedConcernId, setSelectedConcernId] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   
   // Geolocation coordinate tracking state
   const [locationText, setLocationText] = useState<string>('Lagos, NG');
@@ -137,6 +141,12 @@ function App() {
         setPage('chat');
       } else if (path.includes('/profile')) {
         setPage('profile');
+      } else if (path.includes('/concern/')) {
+        const concernId = path.split('/concern/')[1] || '';
+        setSelectedConcernId(concernId);
+        setPage('concern');
+      } else if (path.includes('/styleguide') || path.includes('/design-system')) {
+        setPage('styleguide');
       } else {
         setPage('home');
       }
@@ -147,14 +157,18 @@ function App() {
     return () => window.removeEventListener('popstate', handleRouting);
   }, []);
 
-  const navigateTo = (nextPage: PageType) => {
+  const navigateTo = (nextPage: PageType, param?: string) => {
     if (nextPage === 'home') {
       setSelectedTest(null);
       setSelectedSlot(null);
       setBookingRequest(null);
       setChatLabId(undefined);
       setChatPatientId(undefined);
+      setSelectedConcernId(null);
       window.history.pushState({}, '', '/');
+    } else if (nextPage === 'concern' && param) {
+      setSelectedConcernId(param);
+      window.history.pushState({}, '', `/concern/${param}`);
     } else {
       window.history.pushState({}, '', `/${nextPage}`);
     }
@@ -250,34 +264,34 @@ function App() {
                   </div>
                 </div>
                 <button
-                  onClick={() => handleNavigateToChat()}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
+                  onClick={() => { setMobileMenuOpen(false); handleNavigateToChat(); }}
+                  className={`px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-all flex items-center gap-1.5 cursor-pointer`}
                   title="Chat Messages"
                 >
-                  <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className={`text-brand-forest ${page === 'lab-portal' ? 'w-5 h-5 md:w-3.5 md:h-3.5' : 'w-4 h-4 md:w-3.5 md:h-3.5'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span className="hidden sm:inline">Chat</span>
+                  <span className="inline">Chat</span>
                 </button>
                 {user.role === 'lab_admin' ? (
                   <div className="flex items-center gap-1.5 sm:gap-2">
                     <button
-                      onClick={() => navigateTo('lab-portal')}
-                      className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
+                      onClick={() => { setMobileMenuOpen(false); navigateTo('lab-portal'); }}
+                      className={`px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-all flex items-center gap-1.5 cursor-pointer`}
                       title="Lab Portal"
                     >
-                      <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <svg className={`text-brand-forest ${page === 'lab-portal' ? 'w-5 h-5 md:w-3.5 md:h-3.5' : 'w-4 h-4 md:w-3.5 md:h-3.5'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
                       </svg>
-                      <span className="hidden sm:inline">Portal</span>
+                      <span className={page === 'lab-portal' ? 'inline' : 'hidden sm:inline'}>Portal</span>
                     </button>
                     {!user.lab_id && (
                       <button
-                        onClick={() => navigateTo('onboard-lab')}
-                        className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
+                        onClick={() => { setMobileMenuOpen(false); navigateTo('onboard-lab'); }}
+                        className={`px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-all flex items-center gap-1.5 cursor-pointer`}
                         title="Onboard Lab"
                       >
-                        <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className={`w-4 h-4 md:w-3.5 md:h-3.5 text-brand-forest`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                         </svg>
                         <span className="hidden sm:inline">Onboard Lab</span>
@@ -286,44 +300,77 @@ function App() {
                   </div>
                 ) : (
                   <button
-                    onClick={() => navigateTo('history')}
-                    className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1"
+                    onClick={() => { setMobileMenuOpen(false); navigateTo('history'); }}
+                    className={`px-2.5 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-all flex items-center gap-1.5 cursor-pointer`}
                     title="My Vault"
                   >
-                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className={`w-4 h-4 md:w-3.5 md:h-3.5 text-brand-forest`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <span className="hidden sm:inline">Vault</span>
                   </button>
                 )}
                 
-                <button
-                  onClick={() => navigateTo('profile')}
-                  className="px-2 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold rounded-lg sm:rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1 cursor-pointer"
-                  title="Profile Settings"
-                >
-                  <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  <span className="hidden sm:inline">Profile</span>
-                  {user.verification_status === 'verified' && (
-                    <svg className="w-3 h-3 text-brand-terracotta shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <title>Verified Account</title>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
+                {/* Desktop profile/signout controls */}
+                <div className="hidden md:flex items-center gap-2">
+                  <button
+                    onClick={() => navigateTo('profile')}
+                    className="px-4 py-2 text-sm font-bold rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-colors flex items-center gap-1.5 cursor-pointer"
+                    title="Profile Settings"
+                  >
+                    <svg className="w-3.5 h-3.5 text-brand-forest" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
+                    <span>Profile</span>
+                  </button>
+                  
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2 text-sm font-semibold rounded-xl bg-rose-500/5 border border-rose-500/20 text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    title="Sign Out"
+                  >
+                    <svg className="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+
+                {/* Mobile hamburger menu container */}
+                <div className="md:hidden relative">
+                  <button
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                    className={`px-3 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-brand-panel-light border border-brand-border text-brand-forest hover:bg-brand-sage transition-all flex items-center justify-center cursor-pointer`}
+                    title="Menu"
+                  >
+                    <svg className={`text-brand-forest ${page === 'lab-portal' ? 'w-5 h-5' : 'w-4 h-4'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                  
+                  {mobileMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-brand-cream border border-brand-border rounded-xl shadow-xl z-50 overflow-hidden divide-y divide-brand-border/40 py-1">
+                      <button
+                        onClick={() => { setMobileMenuOpen(false); navigateTo('profile'); }}
+                        className="w-full text-left px-4 py-3 text-xs sm:text-sm text-brand-forest hover:bg-brand-sage/40 transition-colors flex items-center gap-2.5 font-bold cursor-pointer"
+                      >
+                        <svg className={`text-brand-forest ${page === 'lab-portal' ? 'w-5 h-5' : 'w-4 h-4'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        Profile Settings
+                      </button>
+                      <button
+                        onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+                        className="w-full text-left px-4 py-3 text-xs sm:text-sm text-rose-600 hover:bg-rose-500/5 transition-colors flex items-center gap-2.5 font-bold cursor-pointer"
+                      >
+                        <svg className={`text-rose-500 ${page === 'lab-portal' ? 'w-5 h-5' : 'w-4 h-4'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign Out
+                      </button>
+                    </div>
                   )}
-                </button>
-                
-                <button
-                  onClick={handleLogout}
-                  className="px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg sm:rounded-xl bg-rose-500/5 border border-rose-500/20 text-rose-600 hover:bg-rose-500/10 transition-colors flex items-center gap-1.5 cursor-pointer"
-                  title="Sign Out"
-                >
-                  <svg className="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  <span className="hidden sm:inline">Sign Out</span>
-                </button>
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-1.5 sm:gap-2">
@@ -367,7 +414,18 @@ function App() {
       {/* Main page content area */}
       <main className="flex-grow max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 md:py-8">
         {page === 'home' && (
-          <HomePage onSelectTest={handleSelectTest} />
+          <HomePage 
+            onSelectTest={handleSelectTest} 
+            onSelectConcern={(concernId) => navigateTo('concern', concernId)} 
+          />
+        )}
+
+        {page === 'concern' && selectedConcernId && (
+          <ConcernPage 
+            concernId={selectedConcernId} 
+            onSelectTest={handleSelectTest} 
+            onGoBack={() => navigateTo('home')} 
+          />
         )}
         
         {page === 'booking' && selectedTest && (
@@ -472,6 +530,10 @@ function App() {
             onBack={() => navigateTo(user.role === 'lab_admin' ? 'lab-portal' : 'home')}
           />
         )}
+
+        {page === 'styleguide' && (
+          <StyleGuidePage onBack={() => navigateTo('home')} />
+        )}
       </main>
 
       {/* Footer component */}
@@ -483,7 +545,7 @@ function App() {
             <span>© {new Date().getFullYear()} All rights reserved.</span>
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
             <a href="#" className="hover:text-brand-cream transition-colors">Terms of Service</a>
             <a href="#" className="hover:text-brand-cream transition-colors">Privacy Policy</a>
             <button 
@@ -491,6 +553,13 @@ function App() {
               className="hover:text-brand-terracotta transition-colors cursor-pointer"
             >
               Lab Partners
+            </button>
+            <span className="text-brand-light-text/30">•</span>
+            <button 
+              onClick={() => navigateTo('styleguide')} 
+              className="text-brand-cream/80 hover:text-brand-cream hover:underline transition-all cursor-pointer font-bold"
+            >
+              Style Guide
             </button>
           </div>
         </div>

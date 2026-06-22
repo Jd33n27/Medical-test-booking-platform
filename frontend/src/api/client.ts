@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { 
   Lab, Test, TestSlotsResponse, BookingRequest, BookingResponse, BookingStatus, APIResponse,
-  User, LoginRequest, RegisterRequest, AuthResponse, BookingHistoryItem
+  User, LoginRequest, RegisterRequest, AuthResponse, BookingHistoryItem, HealthConcern
 } from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 
@@ -35,11 +35,12 @@ export const api = {
     return response.data.data;
   },
 
-  // Fetch all tests, optional lab_id filter and search term
-  async getTests(labId?: string, search?: string): Promise<Test[]> {
+  // Fetch all tests, optional lab_id filter, search term, and health concern
+  async getTests(labId?: string, search?: string, healthConcernId?: string): Promise<Test[]> {
     const params: Record<string, string> = {};
     if (labId) params.lab_id = labId;
     if (search) params.search = search;
+    if (healthConcernId) params.health_concern_id = healthConcernId;
 
     const response = await client.get<APIResponse<Test[]>>('/api/tests', { params });
     if (!response.data.success) {
@@ -167,6 +168,15 @@ export const api = {
     const response = await client.get<APIResponse<any[]>>('/api/labs/list');
     if (!response.data.success) {
       throw new Error(response.data.error || 'Failed to fetch lab listings');
+    }
+    return response.data.data;
+  },
+
+  // Fetch all health concerns
+  async getHealthConcerns(): Promise<HealthConcern[]> {
+    const response = await client.get<APIResponse<HealthConcern[]>>('/api/health-concerns');
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to fetch health concerns');
     }
     return response.data.data;
   },

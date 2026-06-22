@@ -2,17 +2,91 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { Lab, Test, HealthConcern } from '../types';
 import { formatNaira } from '../utils/formatters';
-import { ConcernIcon } from './ConcernPage';
 
-interface HomePageProps {
+interface ConcernPageProps {
+  concernId: string;
   onSelectTest: (test: Test) => void;
-  onSelectConcern: (concernId: string) => void;
+  onGoBack: () => void;
 }
 
-export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcern }) => {
+// Concern Icon SVG Helper
+export const ConcernIcon: React.FC<{ name: string; className?: string }> = ({ name, className = 'w-6 h-6' }) => {
+  const iconName = name.toLowerCase();
+  if (iconName.includes('diabetes') || iconName.includes('activity')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('heart') && !iconName.includes('handshake')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('kidney') || iconName.includes('filter')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('liver') || iconName.includes('shield')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('infectious') || iconName.includes('bug')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('sexual') || iconName.includes('handshake')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('pregnancy') || iconName.includes('sparkles')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('thyroid') || iconName.includes('flame')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+      </svg>
+    );
+  }
+  if (iconName.includes('bone')) {
+    return (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    );
+  }
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+};
+
+export const ConcernPage: React.FC<ConcernPageProps> = ({ concernId, onSelectTest, onGoBack }) => {
+  const [concern, setConcern] = useState<HealthConcern | null>(null);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [tests, setTests] = useState<Test[]>([]);
-  const [concerns, setConcerns] = useState<HealthConcern[]>([]);
   const [selectedLabId, setSelectedLabId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'proximity' | 'price_asc' | 'price_desc'>('proximity');
@@ -32,38 +106,80 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
           });
         },
         (err) => {
-          console.log('Error getting geolocation in HomePage:', err);
+          console.log('Error getting geolocation in ConcernPage:', err);
         }
       );
     }
   }, []);
 
-  // Distance calculator helper (Haversine formula in km)
+  // Distance calculator helper
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 6371; // Radius of the earth in km
+    const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
       Math.sin(dLat/2) * Math.sin(dLat/2) +
       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLon/2) * Math.sin(dLon/2)
-      ; 
+      Math.sin(dLon/2) * Math.sin(dLon/2); 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-    return R * c; // Distance in km
+    return R * c;
   };
 
-  // Clean and parse search query for smart price searches
+  // Fetch initial concern info & labs
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      try {
+        setLoading(true);
+        const [concernsData, labsData] = await Promise.all([
+          api.getHealthConcerns(),
+          api.getLabs()
+        ]);
+        const found = concernsData.find(c => c.id === concernId);
+        if (found) {
+          setConcern(found);
+        } else {
+          setError('Health concern details could not be found.');
+        }
+        setLabs(labsData);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to load page parameters.');
+      }
+    };
+    fetchMetadata();
+  }, [concernId]);
+
+  // Clean and parse search query for smart price matches
   const cleanQuery = searchQuery.trim().replace(/₦/g, '').replace(/,/g, '').trim();
-  const isNumericQuery = /^\d+(\.\d+)?$/.test(cleanQuery) && cleanQuery !== '';
+  const isNumericQuery = /^\d+(\.\d+)?$/.test(cleanQuery);
   const parsedPrice = isNumericQuery ? parseFloat(cleanQuery) : null;
 
-  // Sort labs dynamically based on proximity
-  const sortedLabs = [...labs].sort((a, b) => {
-    if (!userCoords) return a.name.localeCompare(b.name);
-    const distA = calculateDistance(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
-    const distB = calculateDistance(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
-    return distA - distB;
-  });
+  // Fetch tests based on filters
+  useEffect(() => {
+    if (!concernId) return;
+
+    const fetchFiltered = async () => {
+      try {
+        setLoading(true);
+        // If it's a numeric search query, don't pass search to backend so we can filter close prices locally
+        const searchParam = isNumericQuery ? undefined : (searchQuery || undefined);
+        const filteredTests = await api.getTests(selectedLabId || undefined, searchParam, concernId);
+        setTests(filteredTests);
+        setError(null);
+      } catch (err) {
+        console.error(err);
+        setError('Failed to fetch tests.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const delayDebounce = setTimeout(() => {
+      fetchFiltered();
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [concernId, selectedLabId, searchQuery, isNumericQuery]);
 
   // Apply frontend processing (smart price filter and sorting)
   let processedTests = [...tests];
@@ -76,7 +192,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
     });
   }
 
-  // 2. Sort processed tests dynamically
+  // 2. Apply sorting
   processedTests.sort((a, b) => {
     // If smart price query is active, sort by closeness to the searched price first
     if (parsedPrice !== null) {
@@ -93,7 +209,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
     if (sortBy === 'price_desc') {
       return b.price_naira - a.price_naira;
     }
-
+    
     // Default proximity sorting
     if (userCoords) {
       const labA = labs.find(l => l.id === a.lab_id);
@@ -108,154 +224,73 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
     return a.test_name.localeCompare(b.test_name);
   });
 
-  // Filter sorted labs dynamically based on search queries
-  const filteredSortedLabs = sortedLabs.filter(lab => {
-    if (!searchQuery || isNumericQuery) return true;
-    const query = searchQuery.toLowerCase();
-
-    const matchesLab = 
-      (lab.name || '').toLowerCase().includes(query) ||
-      (lab.city || '').toLowerCase().includes(query) ||
-      (lab.state || '').toLowerCase().includes(query) ||
-      (lab.address || '').toLowerCase().includes(query);
-
-    const hasMatchingTest = tests.some(t => t.lab_id === lab.id);
-
-    return matchesLab || hasMatchingTest;
-  });
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [labsData, testsData, concernsData] = await Promise.all([
-          api.getLabs(),
-          api.getTests(),
-          api.getHealthConcerns()
-        ]);
-        setLabs(labsData);
-        setTests(testsData);
-        setConcerns(concernsData);
-        setError(null);
-      } catch (err) {
-        console.error(err);
-        setError('Unable to load tests and laboratories. Please check if the backend is running.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // Fetch tests again when filter or search query changes
-  useEffect(() => {
-    // Skip initial fetch on mount since it's handled above
-    if (labs.length === 0) return;
-
-    const fetchFiltered = async () => {
-      try {
-        setLoading(true);
-        // If it's a numeric search query, don't pass search to backend
-        const searchParam = isNumericQuery ? undefined : (searchQuery || undefined);
-        const filteredTests = await api.getTests(selectedLabId || undefined, searchParam);
-        setTests(filteredTests);
-        setError(null);
-      } catch (err) {
-        console.error(err);
-        setError('Failed to filter tests.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const delayDebounce = setTimeout(() => {
-      fetchFiltered();
-    }, 300); // 300ms debounce for search inputs
-
-    return () => clearTimeout(delayDebounce);
-  }, [selectedLabId, searchQuery, isNumericQuery]);
+  // Filter sorted labs based on search queries
+  const filteredSortedLabs = [...labs]
+    .sort((a, b) => {
+      if (!userCoords) return a.name.localeCompare(b.name);
+      const distA = calculateDistance(userCoords.latitude, userCoords.longitude, a.latitude, a.longitude);
+      const distB = calculateDistance(userCoords.latitude, userCoords.longitude, b.latitude, b.longitude);
+      return distA - distB;
+    })
+    .filter(lab => {
+      if (!searchQuery || isNumericQuery) return true;
+      const query = searchQuery.toLowerCase();
+      return (
+        (lab.name || '').toLowerCase().includes(query) ||
+        (lab.city || '').toLowerCase().includes(query) ||
+        (lab.state || '').toLowerCase().includes(query) ||
+        (lab.address || '').toLowerCase().includes(query)
+      );
+    });
 
   return (
     <div className="space-y-10">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-brand-sage p-6 sm:p-8 md:p-12">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-brand-forest/5 rounded-full blur-2xl -mr-20 -mt-20"></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-brand-terracotta/5 rounded-full blur-2xl -ml-20 -mb-20"></div>
-        
-        <div className="relative z-10 max-w-2xl space-y-4 sm:space-y-6">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-white text-brand-forest border border-brand-border/40">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand-terracotta animate-pulse"></span>
-            Nigeria's Smartest Lab Booking Platform
-          </span>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-brand-dark-text leading-tight">
-            Book medical tests <br />
-            <span className="text-brand-terracotta">
-              online in seconds.
-            </span>
-          </h1>
-          <p className="text-brand-muted-text text-sm sm:text-base md:text-lg">
-            Compare prices across top certified laboratories. Schedule clinic visits or home sample collection instantly with zero hassle.
-          </p>
-        </div>
-      </section>
+      {/* Header Banner & Back Button */}
+      <section className="py-2 sm:py-4 space-y-4">
+        <button 
+          onClick={onGoBack}
+          className="inline-flex items-center gap-2 text-brand-forest hover:text-brand-terracotta font-bold transition-colors text-sm cursor-pointer"
+        >
+          {/* Back Arrow */}
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Back to Directory
+        </button>
 
-      {/* Browse by Health Concern */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl sm:text-2xl font-extrabold text-brand-light-text tracking-tight">
-            Browse by Health Concern
-          </h2>
-          <span className="text-sm sm:text-base text-brand-terracotta font-bold">
-            Filter tests by conditions
-          </span>
-        </div>
-        
-        {loading && concerns.length === 0 ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="animate-pulse bg-brand-border-dark/15 border border-transparent rounded-2xl p-4 h-16"></div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {concerns.map((c) => (
-              <div
-                key={c.id}
-                onClick={() => onSelectConcern(c.id)}
-                className="group bg-brand-forest hover:bg-brand-border-dark border border-transparent rounded-2xl p-4 flex items-center gap-3.5 transition-all duration-200 cursor-pointer"
-              >
-                <div className="w-10 h-10 rounded-xl bg-brand-sage/10 text-brand-sage flex items-center justify-center group-hover:bg-brand-sage/25 transition-colors">
-                  <ConcernIcon name={c.name} className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-xs sm:text-sm text-brand-light-text transition-colors">
-                    {c.name}
-                  </h4>
-                </div>
-              </div>
-            ))}
+        {concern && (
+          <div className="flex flex-col md:flex-row md:items-center gap-4 pt-2">
+            <div className="w-14 h-14 rounded-2xl bg-brand-forest text-brand-sage flex items-center justify-center shrink-0">
+              <ConcernIcon name={concern.name} className="w-7 h-7" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-brand-dark-text tracking-tight">
+                {concern.name}
+              </h1>
+              <p className="text-brand-muted-text text-sm sm:text-base max-w-2xl">
+                {concern.description}
+              </p>
+            </div>
           </div>
         )}
       </section>
 
-      {/* Main Filter and Test Catalog */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8 border-t border-brand-border-dark/40 pt-10">
+      {/* Main Catalog View */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
         
-        {/* Filters Panel */}
+        {/* Filters Sidebar */}
         <aside className="lg:col-span-1 space-y-6">
           <div className="p-4 sm:p-6 rounded-2xl bento-panel-dark space-y-4 sm:space-y-6">
             <h3 className="text-base sm:text-lg font-bold text-brand-light-text flex items-center gap-2">
-              {/* Filter Icon */}
               <svg className="w-5 h-5 text-brand-terracotta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
               </svg>
-              Filter Catalog
+              Filter Concern
             </h3>
             
             {/* Search Box */}
             <div className="space-y-2">
-              <label className="text-[10px] sm:text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Search Tests & Labs</label>
+              <label className="text-[10px] sm:text-xs font-semibold text-brand-muted-text uppercase tracking-wider block">Search</label>
               <div className="relative">
                 <input
                   type="text"
@@ -322,7 +357,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
               <div className="flex flex-row overflow-x-auto gap-2 pb-2 lg:flex-col lg:space-y-2 lg:pb-0 scrollbar-none w-full min-w-0">
                 <button
                   onClick={() => setSelectedLabId('')}
-                  className={`shrink-0 min-w-max lg:min-w-0 lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 whitespace-nowrap lg:whitespace-normal ${
+                  className={`shrink-0 min-w-max lg:min-w-0 lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 whitespace-nowrap lg:whitespace-normal cursor-pointer ${
                     selectedLabId === ''
                       ? 'bg-brand-terracotta/20 border-brand-terracotta text-brand-terracotta font-semibold'
                       : 'bg-brand-border-dark/25 border-brand-border-dark/60 text-brand-light-text/80 hover:bg-brand-border-dark/40'
@@ -334,7 +369,7 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
                   <button
                     key={lab.id}
                     onClick={() => setSelectedLabId(lab.id)}
-                    className={`shrink-0 min-w-max lg:min-w-0 lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 whitespace-nowrap lg:whitespace-normal ${
+                    className={`shrink-0 min-w-max lg:min-w-0 lg:w-full text-left px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl border text-xs sm:text-sm transition-all duration-200 whitespace-nowrap lg:whitespace-normal cursor-pointer ${
                       selectedLabId === lab.id
                         ? 'bg-brand-terracotta/20 border-brand-terracotta text-brand-terracotta font-semibold'
                         : 'bg-brand-border-dark/25 border-brand-border-dark/60 text-brand-light-text/80 hover:bg-brand-border-dark/40'
@@ -370,14 +405,14 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
               <div className="w-12 h-12 border-4 border-brand-border border-t-brand-terracotta rounded-full animate-spin"></div>
               <p className="text-brand-muted-text text-sm">Searching test inventory...</p>
             </div>
-          ) : tests.length === 0 ? (
+          ) : processedTests.length === 0 ? (
             <div className="text-center py-20 bento-panel-light rounded-2xl p-6">
               <svg className="w-16 h-16 text-brand-muted-text mx-auto mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <h3 className="text-lg font-bold text-brand-dark-text">No tests found</h3>
               <p className="text-brand-muted-text text-sm mt-1 max-w-sm mx-auto">
-                No diagnostic test matches your current filter or keyword. Try resetting your search or laboratory filter.
+                No diagnostic test matches your current filter or price query. Try resetting your search or laboratory filter.
               </p>
             </div>
           ) : (
@@ -439,10 +474,9 @@ export const HomePage: React.FC<HomePageProps> = ({ onSelectTest, onSelectConcer
                   <div className="mt-6 pt-4 border-t border-brand-border flex gap-3">
                     <button
                       onClick={() => onSelectTest(test)}
-                      className="flex-grow flex items-center justify-center gap-2 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text font-bold py-2.5 px-4 rounded-xl transition-all duration-200"
+                      className="flex-grow flex items-center justify-center gap-2 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text font-bold py-2.5 px-4 rounded-xl transition-all duration-200 cursor-pointer"
                     >
                       Book Appointment
-                      {/* Arrow Icon */}
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                       </svg>

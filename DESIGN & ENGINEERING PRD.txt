@@ -1,0 +1,306 @@
+﻿DESIGN & ENGINEERING PRD
+Product Context
+The Lab Test is a healthcare booking platform that enables users to search for laboratory tests, compare prices across accredited diagnostic centers, schedule appointments, request home sample collection, and access digital test results.
+The MVP focuses on simplifying the diagnostic testing process while improving transparency and accessibility.
+The product should reduce the friction associated with finding, comparing, and booking laboratory services.
+Design Objective
+Design an experience that helps users:
+1. Immediately understand that they can compare and book laboratory tests online.
+2. Quickly search and find relevant tests.
+3. Compare available laboratories confidently.
+4. Book appointments with minimal effort.
+5. Access test results digitally.
+The experience should guide users through a clear step by step journey rather than requiring extensive exploration.
+Design Principles
+Clarity Over Complexity
+Users should immediately understand how to search, compare, and book laboratory services.
+Progressive Disclosure
+Present only the information necessary for the user's current task.
+Trust First
+Healthcare decisions require confidence. Accreditation indicators, transparent pricing, and clear information should be visible throughout the experience.
+Mobile First Thinking
+The platform should be designed for mobile users first and adapted for larger screens.
+Accessibility
+Forms, buttons, and content should remain easy to use across age groups and varying levels of technical literacy.
+Information Architecture
+Home
+├─Search Test
+├── Search Results
+│ ├── Laboratory A
+│ ├── Laboratory B
+│ └── Laboratory C
+├── Laboratory Details
+├── Appointment Booking
+├── Booking Confirmation
+├── Home Collection Request
+└── Results Portal
+Screens Included in MVP
+1. Landing Page
+Purpose
+Introduce the product and enable users to start searching immediately.
+Must Include
+* Clear value proposition
+* Search input
+* Popular laboratory tests
+* Benefits section
+* Call to action button
+2. Search Results Page
+Purpose
+Display laboratories that offer the selected test.
+Must Include
+* Test name
+* Search query
+* Laboratory cards
+* Pricing information
+* Distance/location
+* Home collection availability
+* Filters
+3. Laboratory Details Page
+Purpose
+Help users evaluate a laboratory before booking.
+Must Include
+* Laboratory name
+* Accreditation status
+* Address
+* Contact information
+* Available tests
+* Pricing
+* Home collection availability
+* Book Appointment CTA
+4. Appointment Booking Page
+Purpose
+Enable users to schedule appointments.
+Must Include
+* Selected laboratory
+* Selected test
+* Date picker
+* Time slot selector
+* Patient details form
+5. Booking Confirmation Page
+Purpose
+Confirm successful booking.
+Must Include
+* Booking ID
+* Appointment details
+* Laboratory information
+* Next steps
+6. Home Sample Collection Page
+Purpose
+Allow users to request sample collection from home.
+Must Include
+* Address form
+* Collection date selection
+* Contact information
+* Confirmation details
+7. Results Portal
+Purpose
+Allow users to access test results.
+Must Include
+* Result status
+* Download results
+* Result upload date
+* Test information
+UX & Interaction Expectations
+Navigation
+* Users should reach booking within four steps or fewer.
+* Navigation should remain simple and predictable.
+Search
+* Search should support partial matches.
+* Search results should update quickly.
+Forms
+* Inputs should validate in real time.
+* Errors should be displayed clearly.
+CTAs
+Primary actions should always be visible.
+Examples:
+* Search Test
+* Compare Laboratories
+* Book Appointment
+* Download Result
+State Requirements
+Landing Page
+Loading State
+* Skeleton components displayed.
+Error State
+* Unable to load page content.
+Success State
+* Search available.
+Search Results Page
+Loading State
+* Laboratory cards displayed as placeholders.
+Empty State
+"No laboratories currently offer this test."
+Error State
+"Unable to retrieve laboratory results."
+Success State
+* Laboratory results displayed.
+Appointment Booking Page
+Loading State
+* Available dates loading.
+Error State
+* Unable to retrieve appointment slots.
+Success State
+* Appointment successfully scheduled.
+Results Portal
+Empty State
+"Results are not yet available."
+Success State
+* Results available for download.
+Content & Copy Guidance
+All content should be:
+* Simple
+* Reassuring
+* Action oriented
+* Easy to understand
+Avoid medical jargon where possible.
+Examples:
+Good:
+* Book your test in minutes.
+* Compare laboratories instantly.
+* Download your results securely.
+Avoid:
+* Technical healthcare terminology.
+* Long explanatory paragraphs.
+Engineering Objective
+Build a reliable platform that:
+* Supports laboratory discovery.
+* Supports appointment scheduling.
+* Supports home collection requests.
+* Supports digital result access.
+Engineering decisions should prioritize simplicity, scalability, and maintainability.
+System Overview
+The MVP consists of:
+Frontend
+Handles:
+* Search experience
+* Booking flow
+* Results viewing
+Backend API
+Handles:
+* Test retrieval
+* Laboratory retrieval
+* Appointment management
+* Results management
+Database
+Stores:
+* Tests
+* Laboratories
+* Appointments
+* Results
+
+
+Data Model (MVP)
+Test
+* test_id
+* test_name
+* category
+* description
+Laboratory
+* lab_id
+* lab_name
+* address
+* accreditation_status
+* contact_information
+Appointment
+* appointment_id
+* patient_name
+* patient_phone
+* test_id
+* lab_id
+* appointment_date
+* appointment_time
+* status
+Home Collection Request
+* request_id
+* appointment_id
+* address
+* preferred_collection_date
+* status
+Result
+* result_id
+* appointment_id
+* result_file
+* uploaded_at
+API Requirements
+Test Endpoints
+GET /tests
+GET /tests/{id}
+GET /tests/search
+Laboratory Endpoints
+GET /labs
+GET /labs/{id}
+GET /labs/compare
+Appointment Endpoints
+POST /appointments
+GET /appointments/{id}
+PATCH /appointments/{id}
+Home Collection Endpoints
+POST /collections
+GET /collections/{id}
+Result Endpoints
+GET /results/{id}
+DOWNLOAD /results/{id}
+Acceptance Criteria
+FR1 – Search Test
+Acceptance Criteria
+* User can search by test name.
+* Relevant tests are returned.
+* Empty state appears if no result exists.
+FR2 – View Laboratories
+Acceptance Criteria
+* User sees laboratories offering selected test.
+* Prices are displayed clearly.
+* Laboratory details are accessible.
+FR3 – Compare Prices
+Acceptance Criteria
+* User can compare at least two laboratories.
+* Prices are displayed consistently.
+FR4 – Appointment Booking
+Acceptance Criteria
+* User selects available date.
+* User selects available time.
+* User cannot select past dates.
+* Confirmation is generated after booking.
+FR5 – Home Collection
+Acceptance Criteria
+* User submits address successfully.
+* Collection request is stored.
+* Confirmation is displayed.
+FR6 – Results Portal
+Acceptance Criteria
+* User accesses uploaded results.
+* User downloads result file.
+* Result status is displayed.
+Frontend Responsibilities
+The frontend must:
+* Reflect state changes immediately.
+* Consume backend APIs.
+* Display loading states.
+* Display empty states.
+* Display error states.
+* Follow approved Figma designs.
+No data should be hardcoded.
+Performance & Quality Expectations
+* Initial page load under 2 seconds.
+* Search results returned quickly.
+* Responsive across devices.
+* Readable and maintainable codebase.
+* Clear documentation.
+Engineering Deliverables
+* GitHub Repository
+* Database Schema
+* Seed Data
+* Working APIs
+* Frontend Application
+* Deployed Demo
+* Setup Documentation
+* README File
+Out of Scope
+The following are excluded from MVP:
+* Telemedicine consultations
+* AI powered diagnosis
+* Doctor referrals
+* Insurance claim processing
+* Laboratory inventory management
+* Multi language support
+* Advanced analytics dashboards

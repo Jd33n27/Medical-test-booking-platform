@@ -147,3 +147,12 @@ export interface ChatMessage {
   is_deleted?: boolean;
   edited_at?: string | null;
 }
+
+export interface HealthConcern {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  created_at: string;
+}
+

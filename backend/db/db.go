@@ -258,6 +258,10 @@ func SeedDB() {
 		}
 	}
 
+	// Seed health concerns and map tests
+	seedHealthConcerns()
+
+
 	// 1. Check if labs already exist
 	var labCount int
 	err = DB.QueryRow("SELECT COUNT(*) FROM labs").Scan(&labCount)
@@ -468,3 +472,109 @@ func SeedDB() {
 
 	log.Printf("Seeded %d time slots successfully", slotCount)
 }
+
+func seedHealthConcerns() {
+	var count int
+	err := DB.QueryRow("SELECT COUNT(*) FROM health_concerns").Scan(&count)
+	if err != nil {
+		log.Printf("Warning: Failed to query health concerns count: %v", err)
+		return
+	}
+
+	concerns := []struct {
+		ID          string
+		Name        string
+		Description string
+		Icon        string
+	}{
+		{"hc-diabetes", "Diabetes", "Monitor blood glucose levels and manage diabetes risk.", "Activity"},
+		{"hc-heart", "Heart Health", "Assess cholesterol levels and cardiovascular risk factors.", "Heart"},
+		{"hc-kidney", "Kidney Health", "Evaluate renal function, hydration, and filtration efficiency.", "Activity"},
+		{"hc-liver", "Liver Health", "Check enzymes and proteins to monitor liver function and health.", "Shield"},
+		{"hc-infectious", "Infectious Disease", "Screen for malaria, typhoid, viral hepatitis, and systemic infections.", "Bug"},
+		{"hc-sexual", "Sexual Health", "Confidential screening for HIV, syphilis, and other viral infections.", "HeartHandshake"},
+		{"hc-pregnancy", "Pregnancy & Women's Health", "Confirm pregnancy and monitor prenatal health indicators.", "Sparkles"},
+		{"hc-thyroid", "Thyroid Health", "Measure thyroid hormones to evaluate metabolism and energy levels.", "Flame"},
+		{"hc-bone", "Bone & Joint Health", "Assess calcium, uric acid, and vitamin D for skeletal integrity.", "Bone"},
+		{"hc-wellness", "General Wellness", "Routine checkups including blood count, blood group, and basic profiles.", "CheckCircle"},
+	}
+
+	if count == 0 {
+		for _, hc := range concerns {
+			_, err = DB.Exec(`
+				INSERT INTO health_concerns (id, name, description, icon)
+				VALUES (?, ?, ?, ?)
+			`, hc.ID, hc.Name, hc.Description, hc.Icon)
+			if err != nil {
+				log.Printf("Warning: Failed to insert health concern %s: %v", hc.Name, err)
+			}
+		}
+		log.Println("Seeded health concerns successfully")
+	}
+
+	// Always make sure junction mappings are populated
+	_, err = DB.Exec("DELETE FROM test_health_concerns")
+	if err == nil {
+		// Fetch all tests
+		rows, err := DB.Query("SELECT id, test_name FROM tests")
+		if err != nil {
+			log.Printf("Warning: Failed to query tests for concern mapping: %v", err)
+			return
+		}
+		defer rows.Close()
+
+		type testInfo struct {
+			ID   string
+			Name string
+		}
+		var allTests []testInfo
+		for rows.Next() {
+			var t testInfo
+			if err := rows.Scan(&t.ID, &t.Name); err == nil {
+				allTests = append(allTests, t)
+			}
+		}
+
+		// Helper maps keywords to concern IDs
+		mappings := map[string][]string{
+			"hc-diabetes":   {"sugar", "glucose", "hba1c", "diabetes"},
+			"hc-heart":      {"lipid", "cholesterol", "heart", "cardio"},
+			"hc-kidney":     {"kidney", "creatinine", "urinalysis", "urine", "renal", "uric", "electrolyte"},
+			"hc-liver":      {"liver", "hepatitis", "bilirubin", "ast", "alt"},
+			"hc-infectious": {"malaria", "typhoid", "culture", "hepatitis", "hiv", "syphilis", "vdrl", "widal", "parasite", "tuberculosis", "infection"},
+			"hc-sexual":     {"hiv", "syphilis", "vdrl", "hepatitis", "prostate", "psa"},
+			"hc-pregnancy":  {"pregnancy", "hcg", "prenatal"},
+			"hc-thyroid":    {"thyroid", "tsh", "t3", "t4"},
+			"hc-bone":       {"vitamin d", "rheumatoid", "calcium", "joint", "bone"},
+			"hc-wellness":   {"blood", "pcv", "wellness", "health", "screen", "checkup", "panel", "urine", "urinalysis"},
+		}
+
+		insertedCount := 0
+		for _, test := range allTests {
+			testNameLower := strings.ToLower(test.Name)
+			for concernID, keywords := range mappings {
+				match := false
+				for _, kw := range keywords {
+					if strings.Contains(testNameLower, kw) {
+						match = true
+						break
+					}
+				}
+				if match {
+					_, err = DB.Exec(`
+						INSERT INTO test_health_concerns (test_id, health_concern_id)
+						VALUES (?, ?)
+						ON DUPLICATE KEY UPDATE test_id=test_id
+					`, test.ID, concernID)
+					if err == nil {
+						insertedCount++
+					} else {
+						log.Printf("Warning: Failed to map test %s to concern %s: %v", test.Name, concernID, err)
+					}
+				}
+			}
+		}
+		log.Printf("Mapped %d test-concern relationships successfully", insertedCount)
+	}
+}
+
