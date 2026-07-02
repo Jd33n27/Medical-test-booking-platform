@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { api } from "../api/client";
 import { Lab, Test, HealthConcern } from "../types";
 import { formatNaira } from "../utils/formatters";
+import { getCachedLocation } from "../utils/geolocation";
 import { ConcernIcon } from "./ConcernPage";
 
 interface HomePageProps {
@@ -49,21 +50,11 @@ export const HomePage: React.FC<HomePageProps> = ({
     longitude: number;
   } | null>(null);
 
-  // Get user coordinates on mount
+  // Get user coordinates on mount (cached)
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserCoords({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-        },
-        (err) => {
-          console.log("Error getting geolocation in HomePage:", err);
-        },
-      );
-    }
+    getCachedLocation().then((coords) => {
+      if (coords) setUserCoords(coords);
+    });
   }, []);
 
   // Distance calculator helper (Haversine formula in km)

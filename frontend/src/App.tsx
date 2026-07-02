@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import "./App.css";
 import { HomePage } from "./pages/HomePage";
 import { BookingPage } from "./pages/BookingPage";
@@ -48,6 +48,7 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const readNotifIds = useRef<Set<string>>(new Set());
   const [chatLabId, setChatLabId] = useState<string | undefined>(undefined);
   const [chatPatientId, setChatPatientId] = useState<string | undefined>(
     undefined,
@@ -94,23 +95,25 @@ function App() {
           const list: any[] = [];
           data.forEach((b) => {
             if (b.status === "paid") {
+              const id = `pay-${b.booking_id}`;
               list.push({
-                id: `pay-${b.booking_id}`,
+                id,
                 title: "Appointment Confirmed",
                 message: `Payment confirmed for ${b.test_name} at ${b.lab_name}. Date: ${new Date(b.appointment_date).toLocaleDateString()} @ ${b.appointment_time}.`,
                 time: new Date(b.created_at).toLocaleDateString(),
                 type: "payment",
-                unread: true,
+                unread: !readNotifIds.current.has(id),
               });
             }
             if (b.result_ready) {
+              const id = `res-${b.booking_id}`;
               list.push({
-                id: `res-${b.booking_id}`,
+                id,
                 title: "Diagnostic Report Ready",
                 message: `Your medical lab result for ${b.test_name} is ready for download in your Vault.`,
                 time: new Date(b.created_at).toLocaleDateString(),
                 type: "result",
-                unread: true,
+                unread: !readNotifIds.current.has(id),
               });
             }
           });
@@ -130,7 +133,7 @@ function App() {
     } else {
       setNotifications([]);
     }
-  }, [user, page]);
+  }, [user]);
 
   // Router matching on initial mount and history updates
   useEffect(() => {
@@ -687,7 +690,7 @@ function App() {
                       className="fixed inset-0 z-40"
                       onClick={() => setShowNotifications(false)}
                     />
-                    <div className="absolute right-0 mt-2.5 w-[calc(100vw-2rem)] sm:w-80 bg-white border border-[#EAE3D5] rounded-2xl shadow-xl z-50 py-3 text-xs divide-y divide-[#FAF6F0] animate-fadeIn">
+                    <div className="fixed left-1/2 top-16 -translate-x-1/2 w-[calc(100vw-2rem)] sm:w-80 sm:absolute sm:left-auto sm:top-auto sm:translate-x-0 sm:right-0 sm:mt-2.5 bg-white border border-[#EAE3D5] rounded-2xl shadow-xl z-50 py-3 text-xs divide-y divide-[#FAF6F0] animate-fadeIn">
                       <div className="px-4 pb-2.5 flex justify-between items-center">
                         <strong className="text-sm font-black text-[#1F3A2B]">
                           Inbox Notifications
@@ -695,6 +698,7 @@ function App() {
                         {notifications.some((n) => n.unread) && (
                           <button
                             onClick={() => {
+                              notifications.forEach((n) => readNotifIds.current.add(n.id));
                               setNotifications(
                                 notifications.map((n) => ({
                                   ...n,
@@ -720,6 +724,7 @@ function App() {
                               key={n.id}
                               className={`px-4 py-3 hover:bg-[#FAF6F0] transition-colors cursor-pointer text-left ${n.unread ? "bg-[#D26E4F]/5" : ""}`}
                               onClick={() => {
+                                readNotifIds.current.add(n.id);
                                 setNotifications(
                                   notifications.map((item) =>
                                     item.id === n.id

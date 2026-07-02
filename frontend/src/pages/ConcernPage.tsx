@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import { Lab, Test, HealthConcern } from '../types';
 import { formatNaira } from '../utils/formatters';
+import { getCachedLocation } from '../utils/geolocation';
 
 interface ConcernPageProps {
   concernId: string;
@@ -113,21 +114,11 @@ export const ConcernPage: React.FC<ConcernPageProps> = ({ concernId, onSelectTes
   const [error, setError] = useState<string | null>(null);
   const [userCoords, setUserCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
-  // Get user coordinates on mount
+  // Get user coordinates on mount (cached)
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserCoords({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-        },
-        (err) => {
-          console.log('Error getting geolocation in ConcernPage:', err);
-        }
-      );
-    }
+    getCachedLocation().then((coords) => {
+      if (coords) setUserCoords(coords);
+    });
   }, []);
 
   // Distance calculator helper
