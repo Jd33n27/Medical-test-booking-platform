@@ -26,10 +26,10 @@ func InitDB() {
 		log.Fatalf("Failed to open database: %v", err)
 	}
 
-	// Set connection limits
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(5)
-	DB.SetConnMaxLifetime(time.Hour)
+	// Set connection limits (free-tier MySQL allows max 5 concurrent connections)
+	DB.SetMaxOpenConns(3)
+	DB.SetMaxIdleConns(2)
+	DB.SetConnMaxLifetime(5 * time.Minute)
 
 	// Ping database to verify connection
 	err = DB.Ping()

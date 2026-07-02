@@ -875,13 +875,11 @@ export const LabPortalPage: React.FC<LabPortalPageProps> = ({ user, onLogout, on
 
               {/* TAB 5: PROFILE SETTINGS */}
               {activeTab === 'profile' && (
-                <div className="bg-white border border-[#EAE3D5] rounded-3xl p-8 shadow-sm">
-                  <ProfilePage 
-                    user={user} 
-                    onUpdateUser={onUpdateUser} 
-                    onBack={() => setActiveTab('bookings')}
-                  />
-                </div>
+                <ProfilePage 
+                  user={user} 
+                  onUpdateUser={onUpdateUser} 
+                  onBack={() => setActiveTab('bookings')}
+                />
               )}
             </>
           )}

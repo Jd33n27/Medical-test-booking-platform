@@ -9,6 +9,8 @@ interface ChatPageProps {
 }
 
 const POLL_INTERVAL = 3000; // Poll messages every 3 seconds
+const THREADS_CACHE_KEY = 'medbook_chat_threads';
+const MESSAGES_CACHE_PREFIX = 'medbook_chat_msgs_';
 
 export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initialPatientId }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -52,6 +54,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
     try {
       const data = await api.getChatThreads();
       setThreads(data);
+      try { sessionStorage.setItem(THREADS_CACHE_KEY, JSON.stringify(data)); } catch {}
 
       // If we have an active thread, refresh its name in case it changed
       if (activeThreadId) {
@@ -71,7 +74,18 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
     if (!user) return;
 
     const init = async () => {
-      setLoading(true);
+      // Hydrate threads from cache instantly (stale-while-revalidate)
+      try {
+        const cached = sessionStorage.getItem(THREADS_CACHE_KEY);
+        if (cached) {
+          setThreads(JSON.parse(cached));
+          setLoading(false);
+        } else {
+          setLoading(true);
+        }
+      } catch {
+        setLoading(true);
+      }
       await fetchThreads();
 
       // Check if we were redirected with a specific chat target
@@ -130,7 +144,22 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
     const currentUser = userRef.current;
     if (!activeThreadId || !currentUser) return;
 
-    if (showLoading) setLoadingMessages(true);
+    const cacheKey = MESSAGES_CACHE_PREFIX + activeThreadId;
+
+    // Hydrate from cache instantly if this is an initial load
+    if (showLoading) {
+      try {
+        const cached = sessionStorage.getItem(cacheKey);
+        if (cached) {
+          setMessages(JSON.parse(cached));
+        } else {
+          setLoadingMessages(true);
+        }
+      } catch {
+        setLoadingMessages(true);
+      }
+    }
+
     try {
       const params = currentUser.role === 'patient' 
         ? { lab_id: activeThreadId } 
@@ -138,8 +167,8 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
         
       const data = await api.getChatMessages(params);
       
-      // Only update state if message count changes or message statuses change to prevent excessive re-renders
       setMessages(data);
+      try { sessionStorage.setItem(cacheKey, JSON.stringify(data)); } catch {}
     } catch (err) {
       console.error('Failed to load messages:', err);
     } finally {
@@ -367,7 +396,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
                   {/* Thread details snippet */}
                   <div className="flex-grow overflow-hidden space-y-1">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-brand-dark-text truncate max-w-[120px]">{thread.name}</h4>
+                      <h4 className="text-xs font-bold text-brand-dark-text truncate">{thread.name}</h4>
                       <span className="text-[9px] text-brand-muted-text font-semibold">{formatChatTime(thread.last_message_time)}</span>
                     </div>
                     <p className="text-[11px] text-brand-muted-text/80 truncate pr-4">{thread.last_message}</p>
