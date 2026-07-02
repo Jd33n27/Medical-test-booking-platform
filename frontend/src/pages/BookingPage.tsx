@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { api } from "../api/client";
-import { Test, TimeSlot, BookingRequest, Review } from "../types";
+import { Test, TimeSlot, BookingRequest, Review, Lab } from "../types";
 import { formatNaira } from "../utils/formatters";
 
 interface BookingPageProps {
@@ -29,6 +29,28 @@ export const BookingPage: React.FC<BookingPageProps> = ({
   // Visit type state
   const [visitType, setVisitType] = useState<"clinic" | "home">("clinic");
   const [collectionAddress, setCollectionAddress] = useState<string>("");
+  const [labs, setLabs] = useState<Lab[]>([]);
+
+  useEffect(() => {
+    const fetchLabs = async () => {
+      try {
+        const data = await api.getLabs();
+        setLabs(data);
+      } catch (err) {
+        console.error("Failed to load labs", err);
+      }
+    };
+    fetchLabs();
+  }, []);
+
+  const selectedLab = labs.find((l) => l.id === selectedTest.lab_id);
+  const acceptsHomeCollection = selectedLab ? selectedLab.accepts_home_collection : true;
+
+  useEffect(() => {
+    if (!acceptsHomeCollection && visitType === "home") {
+      setVisitType("clinic");
+    }
+  }, [acceptsHomeCollection, visitType]);
 
   // Autocomplete suggestions states for home collection address
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -707,17 +729,29 @@ export const BookingPage: React.FC<BookingPageProps> = ({
 
                 {/* Home Collection */}
                 <div
-                  onClick={() => setVisitType("home")}
-                  className={`p-5 flex flex-col items-center justify-between text-center rounded-2xl border transition-all duration-200 cursor-pointer space-y-3 ${
-                    visitType === "home"
-                      ? "bg-brand-terracotta/5 border-brand-terracotta"
-                      : "bg-white border-[#EAE3D5] hover:border-brand-forest/40"
+                  onClick={() => {
+                    if (acceptsHomeCollection) {
+                      setVisitType("home");
+                    }
+                  }}
+                  className={`p-5 flex flex-col items-center justify-between text-center rounded-2xl border transition-all duration-200 space-y-3 ${
+                    !acceptsHomeCollection
+                      ? "bg-gray-50 border-gray-200 opacity-50 cursor-not-allowed"
+                      : visitType === "home"
+                        ? "bg-brand-terracotta/5 border-brand-terracotta cursor-pointer"
+                        : "bg-white border-[#EAE3D5] hover:border-brand-forest/40 cursor-pointer"
                   }`}
                 >
                   <span
-                    className={`rounded-full p-4 ${visitType === "home" ? "bg-brand-terracotta" : "bg-brand-panel-light"}`}
+                    className={`rounded-full p-4 ${
+                      !acceptsHomeCollection
+                        ? "bg-gray-200 text-gray-400"
+                        : visitType === "home"
+                          ? "bg-brand-terracotta"
+                          : "bg-brand-panel-light"
+                    }`}
                   >
-                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={visitType === "home" ? "text-white" : "text-[#1A3026]"}>
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className={!acceptsHomeCollection ? "text-gray-400" : visitType === "home" ? "text-white" : "text-[#1A3026]"}>
                       <path d="M20 28V17.3333C20 16.597 19.403 16 18.6667 16H13.3333C12.597 16 12 16.597 12 17.3333V28" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       <path d="M4 12.9617C3.99981 12.1566 4.34566 11.3924 4.94533 10.8727L14.2787 2.67001C15.2725 1.80877 16.7275 1.80877 17.7213 2.67001L27.0547 10.8727C27.6543 11.3924 28.0002 12.1566 28 12.9617V25.2658C28 26.7759 26.8061 28 25.3333 28H6.66667C5.19391 28 4 26.7759 4 25.2658V12.9617Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
@@ -726,10 +760,12 @@ export const BookingPage: React.FC<BookingPageProps> = ({
                     Home Collection
                   </span>
                   <p className="text-sm text-brand-muted-text leading-relaxed">
-                    A certified professional comes to your location.
+                    {!acceptsHomeCollection
+                      ? "This laboratory does not offer home sample collections."
+                      : "A certified professional comes to your location."}
                   </p>
-                  <span className="text-sm text-brand-forest font-bold">
-                    + ₦5,000 fee
+                  <span className={`text-sm font-bold ${!acceptsHomeCollection ? "text-rose-600" : "text-brand-forest"}`}>
+                    {!acceptsHomeCollection ? "Not Available" : "+ ₦5,000 fee"}
                   </span>
                 </div>
               </div>

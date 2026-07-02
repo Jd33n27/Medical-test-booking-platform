@@ -81,10 +81,15 @@ func CreateBooking(c fiber.Ctx) error {
 	}
 	defer tx.Rollback()
 
-	// 2. Fetch test details (price)
+	// 2. Fetch test details (price and home collection support)
 	var price float64
 	var testLabID string
-	err = tx.QueryRow("SELECT price_naira, lab_id FROM tests WHERE id = ?", req.TestID).Scan(&price, &testLabID)
+	var acceptsHomeCollection bool
+	err = tx.QueryRow(`
+		SELECT t.price_naira, t.lab_id, l.accepts_home_collection 
+		FROM tests t 
+		JOIN labs l ON t.lab_id = l.id 
+		WHERE t.id = ?`, req.TestID).Scan(&price, &testLabID, &acceptsHomeCollection)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return c.Status(404).JSON(fiber.Map{
@@ -98,6 +103,15 @@ func CreateBooking(c fiber.Ctx) error {
 			"success":   false,
 			"data":      nil,
 			"error":     "Database error checking test details",
+			"timestamp": time.Now().Format(time.RFC3339),
+		})
+	}
+
+	if req.HomeCollection && !acceptsHomeCollection {
+		return c.Status(400).JSON(fiber.Map{
+			"success":   false,
+			"data":      nil,
+			"error":     "Home collection is not offered by the selected laboratory",
 			"timestamp": time.Now().Format(time.RFC3339),
 		})
 	}
@@ -196,6 +210,10 @@ func CreateBooking(c fiber.Ctx) error {
 		}
 		totalPrice = price - discount
 		promoCodeApplied = req.PromoCode
+	}
+
+	if req.HomeCollection {
+		totalPrice += 5000.00
 	}
 
 	// 4. Create the booking entry in DB

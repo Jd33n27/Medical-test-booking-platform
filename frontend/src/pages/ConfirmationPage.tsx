@@ -53,7 +53,8 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({ test, slot, 
       discountAmount = appliedPromo.discount_amount;
     }
   }
-  const finalPrice = Math.max(0, test.price_naira - discountAmount);
+  const homeFee = bookingData.home_collection ? 5000 : 0;
+  const finalPrice = Math.max(0, test.price_naira - discountAmount + homeFee);
 
   const handlePay = async () => {
     try {
@@ -214,6 +215,12 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({ test, slot, 
               <span>Test Price Subtotal</span>
               <span>{formatNaira(test.price_naira)}</span>
             </div>
+            {bookingData.home_collection && (
+              <div className="flex justify-between text-brand-muted-text">
+                <span>Home Collection Fee</span>
+                <span>{formatNaira(5000)}</span>
+              </div>
+            )}
             {discountAmount > 0 && (
               <div className="flex justify-between text-brand-forest font-semibold animate-fadeIn">
                 <span>Coupon Discount</span>
