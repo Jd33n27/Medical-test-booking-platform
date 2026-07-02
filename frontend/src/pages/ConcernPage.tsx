@@ -87,6 +87,24 @@ export const ConcernPage: React.FC<ConcernPageProps> = ({ concernId, onSelectTes
   const [concern, setConcern] = useState<HealthConcern | null>(null);
   const [labs, setLabs] = useState<Lab[]>([]);
   const [tests, setTests] = useState<Test[]>([]);
+  const [showBackToTop, setShowBackToTop] = useState<boolean>(false);
+
+  // Monitor viewport scroll level to toggle Back to Top visibility
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 400) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   const [selectedLabId, setSelectedLabId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [sortBy, setSortBy] = useState<'proximity' | 'price_asc' | 'price_desc'>('proximity');
@@ -279,7 +297,7 @@ export const ConcernPage: React.FC<ConcernPageProps> = ({ concernId, onSelectTes
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-8">
         
         {/* Filters Sidebar */}
-        <aside className="lg:col-span-1 space-y-6">
+        <aside className="lg:col-span-1 lg:sticky lg:top-24 h-fit space-y-6">
           <div className="p-4 sm:p-6 rounded-2xl bento-panel-dark space-y-4 sm:space-y-6">
             <h3 className="text-base sm:text-lg font-bold text-brand-light-text flex items-center gap-2">
               <svg className="w-5 h-5 text-brand-terracotta" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -416,80 +434,86 @@ export const ConcernPage: React.FC<ConcernPageProps> = ({ concernId, onSelectTes
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 justify-items-stretch sm:justify-items-center">
               {processedTests.map((test) => (
                 <div 
                   key={test.id} 
-                  className="group relative flex flex-col justify-between p-6 rounded-2xl bento-panel-light transition-all duration-200"
+                  className="group relative flex flex-col justify-between p-4 rounded-[16px] border-2 border-brand-border-dark/30 bento-panel-light transition-all duration-200 w-full sm:w-[286px] min-h-[266px] sm:h-[266px] shrink-0"
                 >
-                  <div className="space-y-4">
+                  <div className="flex flex-col justify-between h-full space-y-2">
                     {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-forest/10 text-brand-forest border border-brand-forest/20">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-forest/10 text-brand-forest border border-brand-forest/20">
                         {test.sample_type}
                       </span>
-                      <span className="text-lg font-extrabold text-brand-terracotta">
+                      <span className="text-base font-extrabold text-brand-terracotta">
                         {formatNaira(test.price_naira)}
                       </span>
                     </div>
 
                     {/* Test Info */}
                     <div>
-                      <h4 className="text-xl font-bold text-brand-dark-text group-hover:text-brand-terracotta transition-colors">
+                      <h4 className="text-sm font-extrabold text-brand-dark-text group-hover:text-brand-terracotta transition-colors line-clamp-1" title={test.test_name}>
                         {test.test_name}
                       </h4>
-                      <p className="text-brand-muted-text text-sm mt-1 line-clamp-2">
+                      <p className="text-brand-muted-text text-[11px] mt-0.5 line-clamp-2 leading-relaxed">
                         {test.description}
                       </p>
                     </div>
 
                     {/* Lab & Turnaround Info */}
-                    <div className="pt-4 border-t border-brand-border grid grid-cols-2 gap-4 text-xs text-brand-muted-text">
-                      <div>
-                        <span className="block text-brand-muted-text uppercase tracking-wider font-semibold text-[10px]">Laboratory</span>
-                        <span className="font-semibold text-brand-dark-text mt-0.5 block">{test.lab_name}</span>
+                    <div className="pt-2 border-t border-brand-border/60 text-[11px] text-brand-muted-text space-y-1">
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0">
+                          <span className="font-extrabold text-brand-dark-text block truncate">{test.lab_name}</span>
+                          {(() => {
+                            const lab = labs.find(l => l.id === test.lab_id);
+                            if (!lab) return null;
+                            return (
+                              <span className="text-[10px] text-brand-muted-text/80 block truncate">
+                                {lab.address}, {lab.city}
+                              </span>
+                            );
+                          })()}
+                        </div>
                         {(() => {
                           const lab = labs.find(l => l.id === test.lab_id);
-                          if (!lab) return null;
+                          if (!lab || !userCoords) return null;
+                          const dist = calculateDistance(userCoords.latitude, userCoords.longitude, lab.latitude, lab.longitude);
                           return (
-                            <span className="text-[10px] text-brand-muted-text mt-0.5 block">
-                              {lab.address}, {lab.city}
-                              {userCoords && (
-                                <span className="text-brand-terracotta font-semibold block mt-0.5">
-                                  {calculateDistance(userCoords.latitude, userCoords.longitude, lab.latitude, lab.longitude).toFixed(1)} km away
-                                </span>
-                              )}
+                            <span className="text-[10px] text-brand-terracotta font-bold shrink-0">
+                              {dist.toFixed(1)} km
                             </span>
                           );
                         })()}
                       </div>
-                      <div>
-                        <span className="block text-brand-muted-text uppercase tracking-wider font-semibold text-[10px]">Turnaround Time</span>
-                        <span className="font-semibold text-brand-dark-text mt-0.5 block">{test.turnaround_hours} hours</span>
+                      <div className="text-[10px] flex items-center justify-between pt-1 text-brand-muted-text">
+                        <span>Turnaround:</span>
+                        <strong className="text-brand-dark-text">{test.turnaround_hours} hours</strong>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Actions */}
-                  <div className="mt-6 pt-4 border-t border-brand-border flex gap-3">
-                    <button
-                      onClick={() => onSelectTest(test)}
-                      className="flex-grow flex items-center justify-center gap-2 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text font-bold py-2.5 px-4 rounded-xl transition-all duration-200 cursor-pointer"
-                    >
-                      Book Appointment
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => (window as any).navigateToChat?.(test.lab_id)}
-                      title="Chat with Lab"
-                      className="px-3.5 py-2.5 bg-brand-sage/40 hover:bg-brand-sage text-brand-forest border border-brand-border rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center"
-                    >
-                      <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                    </button>
+                    {/* Actions */}
+                    <div className="pt-2 border-t border-brand-border/60 flex gap-2">
+                      <button
+                        onClick={() => onSelectTest(test)}
+                        className="flex-grow flex items-center justify-center gap-1.5 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text font-bold py-2 px-3 rounded-xl transition-all duration-200 cursor-pointer text-xs"
+                      >
+                        Book Appointment
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                      <button
+                        onClick={() => (window as any).navigateToChat?.(test.lab_id)}
+                        title="Chat with Lab"
+                        className="p-2 bg-brand-sage/40 hover:bg-brand-sage text-brand-forest border border-brand-border rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center shrink-0"
+                      >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -497,6 +521,19 @@ export const ConcernPage: React.FC<ConcernPageProps> = ({ concernId, onSelectTes
           )}
         </main>
       </div>
+
+      {/* Floating Back to Top Button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 p-3 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text rounded-full shadow-2xl transition-all duration-300 transform scale-100 hover:scale-110 cursor-pointer flex items-center justify-center border border-white/10"
+          title="Back to Top"
+        >
+          <svg className="w-5.5 h-5.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        </button>
+      )}
     </div>
   );
 };

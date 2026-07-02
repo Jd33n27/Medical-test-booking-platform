@@ -133,6 +133,24 @@ func runMigrations() {
 		}
 	}
 
+	// Add health columns to users table
+	var healthColsExist int
+	err = DB.QueryRow(`
+		SELECT COUNT(*) 
+		FROM information_schema.columns 
+		WHERE table_name = 'users' 
+		  AND column_name = 'blood_pressure' 
+		  AND table_schema = DATABASE()
+	`).Scan(&healthColsExist)
+	if err == nil && healthColsExist == 0 {
+		_, err = DB.Exec("ALTER TABLE users ADD COLUMN blood_pressure VARCHAR(20) NULL, ADD COLUMN blood_sugar INT NULL, ADD COLUMN height_cm DOUBLE NULL, ADD COLUMN weight_kg DOUBLE NULL")
+		if err != nil {
+			log.Printf("Warning: Failed to add health columns to users: %v", err)
+		} else {
+			log.Println("Database columns users.blood_pressure, blood_sugar, height_cm, weight_kg added successfully")
+		}
+	}
+
 	// Phase 3: Add split pricing and promo code columns to bookings
 	var platformCommExists int
 	err = DB.QueryRow(`
@@ -236,14 +254,39 @@ func runMigrations() {
 		}
 	}
 
+	// Create reviews table if not exists
+	_, err = DB.Exec(`
+		CREATE TABLE IF NOT EXISTS reviews (
+			id VARCHAR(36) PRIMARY KEY,
+			lab_id VARCHAR(36) NOT NULL,
+			user_id VARCHAR(36) NULL,
+			rating INT NOT NULL,
+			reviewer_name VARCHAR(255) NOT NULL,
+			comment TEXT,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (lab_id) REFERENCES labs(id) ON DELETE CASCADE,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+		)
+	`)
+	if err != nil {
+		log.Printf("Warning: Failed to create reviews table: %v", err)
+	}
+
 	log.Println("Database migrations executed successfully")
 }
 
 // SeedDB seeds labs, tests, and time slots
 func SeedDB() {
+	// Clean up old unbooked future slots so they are regenerated with the new timeslots
+	todayStr := time.Now().Format("2006-01-02")
+	_, err := DB.Exec("DELETE FROM time_slots WHERE slot_date >= ? AND booked = 0", todayStr)
+	if err != nil {
+		log.Printf("Warning: Failed to clean up unbooked slots: %v", err)
+	}
+
 	// Phase 3: Seed promo codes (runs independently of lab checks)
 	var promoCount int
-	err := DB.QueryRow("SELECT COUNT(*) FROM promo_codes").Scan(&promoCount)
+	err = DB.QueryRow("SELECT COUNT(*) FROM promo_codes").Scan(&promoCount)
 	if err == nil && promoCount == 0 {
 		_, err = DB.Exec(`
 			INSERT INTO promo_codes (code, discount_percent, discount_amount, is_active, expires_at)
@@ -443,13 +486,42 @@ func SeedDB() {
 			}
 			testCount++
 		}
+
+		// Seed mock reviews for each lab
+		mockReviews := []struct {
+			Rating       int
+			ReviewerName string
+			Comment      string
+		}{
+			{5, "Chioma Nwachukwu", "Excellent and fast service! My blood count test result was ready in less than 2 hours."},
+			{4, "Abubakar Ibrahim", "Very professional staff. The clinic is clean and they adhered to scheduled time."},
+		}
+		for _, r := range mockReviews {
+			reviewID := uuid.New().String()
+			_, err = DB.Exec(`
+				INSERT INTO reviews (id, lab_id, rating, reviewer_name, comment)
+				VALUES (?, ?, ?, ?, ?)
+			`, reviewID, id, r.Rating, r.ReviewerName, r.Comment)
+			if err != nil {
+				log.Printf("Warning: Failed to seed review for lab %s: %v", l.Name, err)
+			}
+		}
 	}
 
 	log.Printf("Seeded %d labs and %d custom tests successfully", len(labIDs), testCount)
 
-	// Generate Time Slots: next 7 days, 3 slots per day (9 AM, 12 PM, 3 PM), capacity 10 each
+	// Generate Time Slots: next 7 days, slots from 8 AM to 4 PM (excluding 12 PM), capacity 10 each
 	slotCount := 0
-	times := []string{"09:00:00", "12:00:00", "15:00:00"}
+	times := []string{
+		"08:00:00",
+		"09:00:00",
+		"10:00:00",
+		"11:00:00",
+		"13:00:00",
+		"14:00:00",
+		"15:00:00",
+		"16:00:00",
+	}
 	now := time.Now()
 
 	for i := 0; i < 7; i++ {

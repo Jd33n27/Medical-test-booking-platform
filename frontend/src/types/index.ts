@@ -21,6 +21,18 @@ export interface Test {
   sample_type: string;
   created_at: string;
   lab_name?: string;
+  average_rating?: number;
+  num_ratings?: number;
+}
+
+export interface Review {
+  id: string;
+  lab_id: string;
+  user_id?: string | null;
+  rating: number;
+  reviewer_name: string;
+  comment: string;
+  created_at: string;
 }
 
 export interface TimeSlot {
@@ -85,6 +97,10 @@ export interface User {
   id_number?: string;
   verification_document?: string;
   created_at: string;
+  blood_pressure?: string;
+  blood_sugar?: number;
+  height_cm?: number;
+  weight_kg?: number;
   lab_name?: string;
   lab_address?: string;
   lab_city?: string;
@@ -126,6 +142,9 @@ export interface BookingHistoryItem {
   total_price_naira: number;
   created_at: string;
   lab_id: string;
+  home_collection: boolean;
+  collection_address?: string | null;
+  test_id: string;
 }
 
 export interface ChatThread {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api, API_BASE_URL } from '../api/client';
-import { BookingHistoryItem } from '../types';
+import { BookingHistoryItem, Review } from '../types';
 import { formatNaira, formatDateString } from '../utils/formatters';
 
 interface HistoryPageProps {
@@ -11,6 +11,57 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ onBack }) => {
   const [history, setHistory] = useState<BookingHistoryItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Reviews state variables
+  const [showReviewsLabId, setShowReviewsLabId] = useState<string | null>(null);
+  const [showReviewsLabName, setShowReviewsLabName] = useState<string>("");
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState<boolean>(false);
+  const [reviewsError, setReviewsError] = useState<string | null>(null);
+
+  // Review submission state variables
+  const [newRating, setNewRating] = useState<number>(5);
+  const [newReviewerName, setNewReviewerName] = useState<string>("");
+  const [newComment, setNewComment] = useState<string>("");
+  const [submittingReview, setSubmittingReview] = useState<boolean>(false);
+
+  const handleReviewLab = async (labId: string, labName: string) => {
+    setShowReviewsLabId(labId);
+    setShowReviewsLabName(labName);
+    setReviewsLoading(true);
+    setReviewsError(null);
+    try {
+      const data = await api.getLabReviews(labId);
+      setReviews(data);
+    } catch (err: any) {
+      console.error(err);
+      setReviewsError(err.message || "Failed to load reviews");
+    } finally {
+      setReviewsLoading(false);
+    }
+  };
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!showReviewsLabId) return;
+    setSubmittingReview(true);
+    try {
+      const newReview = await api.submitLabReview(
+        showReviewsLabId,
+        newRating,
+        newReviewerName,
+        newComment
+      );
+      setReviews((prev) => [newReview, ...prev]);
+      setNewComment("");
+      setNewReviewerName("");
+      setNewRating(5);
+    } catch (err: any) {
+      alert(err.message || "Failed to submit review");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -94,8 +145,11 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ onBack }) => {
                 <div className="space-y-3 flex-grow">
                   <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                     <h3 className="text-lg sm:text-xl font-bold text-brand-dark-text">{booking.test_name}</h3>
-                    <span className="font-mono text-[10px] sm:text-[11px] bg-brand-sage text-brand-forest border border-brand-border px-2 py-0.5 rounded-md select-all uppercase">
-                      REF: {booking.booking_id}
+                    <span 
+                      className="font-mono text-[10px] sm:text-[11px] bg-brand-sage text-brand-forest border border-brand-border px-2 py-0.5 rounded-md select-all uppercase truncate max-w-[140px] inline-block"
+                      title={booking.booking_id}
+                    >
+                      REF: {booking.booking_id.substring(0, 8)}...
                     </span>
                     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold uppercase border ${
                       isPaid 
@@ -143,6 +197,16 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ onBack }) => {
                     Chat with Lab
                   </button>
 
+                  <button
+                    onClick={() => handleReviewLab(booking.lab_id, booking.lab_name)}
+                    className="flex-grow md:flex-grow-0 inline-flex items-center justify-center gap-2 bg-brand-sage hover:bg-brand-border/40 border border-brand-border text-brand-forest font-bold py-2 px-3 sm:px-4 rounded-xl text-xs sm:text-sm transition-all shadow-sm cursor-pointer"
+                  >
+                    <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-500 fill-current" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                    Review Lab
+                  </button>
+
                   {booking.result_ready && booking.result_file_url ? (
                     <a
                       href={`${API_BASE_URL}${booking.result_file_url}`}
@@ -170,6 +234,155 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({ onBack }) => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Reviews Modal */}
+      {showReviewsLabId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-forest/35 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white border border-[#EAE3D5] rounded-3xl p-6 md:p-8 max-w-lg w-full shadow-xl flex flex-col max-h-[85vh] overflow-hidden animate-slideUp">
+            {/* Header */}
+            <div className="flex justify-between items-center pb-4 border-b border-[#FAF6F0]">
+              <div>
+                <h4 className="text-lg font-black text-brand-forest">
+                  Reviews & Ratings
+                </h4>
+                <p className="text-xs text-brand-muted-text font-semibold">
+                  For {showReviewsLabName}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowReviewsLabId(null);
+                  setReviews([]);
+                }}
+                className="w-8 h-8 rounded-full bg-[#FAF6F0] hover:bg-brand-sage/40 flex items-center justify-center text-brand-muted-text transition-colors cursor-pointer"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content (Scrollable reviews list + Form) */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-6 pr-1">
+              {/* Form to submit review */}
+              <form onSubmit={handleSubmitReview} className="bg-[#FAF6F0]/60 border border-[#EAE3D5] rounded-2xl p-4 space-y-4">
+                <h5 className="text-xs font-bold text-brand-forest uppercase tracking-wider">
+                  Write a Review
+                </h5>
+                
+                {/* Star rating selector */}
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-semibold text-brand-muted-text">Rating:</span>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setNewRating(star)}
+                        className="p-0.5 text-amber-500 hover:scale-110 transition-transform cursor-pointer"
+                      >
+                        {newRating >= star ? (
+                          <svg className="w-6 h-6 fill-current" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                        ) : (
+                          <svg className="w-6 h-6 fill-none stroke-current" viewBox="0 0 24 24" strokeWidth="2">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.977-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.837-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Name */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-muted-text uppercase tracking-wider block">
+                    Your Name (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Jane Doe (Leave blank to use account name)"
+                    value={newReviewerName}
+                    onChange={(e) => setNewReviewerName(e.target.value)}
+                    className="w-full bg-white text-brand-dark-text border border-[#EAE3D5] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#D26E4F] transition-colors"
+                  />
+                </div>
+
+                {/* Comment */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-brand-muted-text uppercase tracking-wider block">
+                    Review Comment
+                  </label>
+                  <textarea
+                    rows={3}
+                    required
+                    placeholder="Share your experience with this laboratory facility..."
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    className="w-full bg-white text-brand-dark-text border border-[#EAE3D5] rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-[#D26E4F] transition-colors"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submittingReview}
+                  className="w-full py-2 bg-brand-forest hover:bg-brand-forest/90 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {submittingReview ? "Submitting..." : "Submit Review"}
+                </button>
+              </form>
+
+              {/* Reviews List */}
+              <div className="space-y-3">
+                <h5 className="text-xs font-bold text-brand-forest uppercase tracking-wider">
+                  Patient Reviews ({reviews.length})
+                </h5>
+
+                {reviewsLoading ? (
+                  <div className="flex flex-col items-center justify-center py-6 space-y-1">
+                    <div className="w-6 h-6 border-2 border-[#EAE3D5] border-t-brand-forest rounded-full animate-spin"></div>
+                    <span className="text-[10px] text-brand-muted-text">Loading reviews...</span>
+                  </div>
+                ) : reviewsError ? (
+                  <p className="text-xs text-rose-600 text-center">{reviewsError}</p>
+                ) : reviews.length === 0 ? (
+                  <p className="text-xs text-brand-muted-text text-center py-4 bg-[#FAF6F0]/20 rounded-xl">
+                    No reviews yet. Be the first to review this laboratory!
+                  </p>
+                ) : (
+                  <div className="space-y-3">
+                    {reviews.map((rev) => (
+                      <div key={rev.id} className="p-3 bg-white border border-[#EAE3D5]/60 rounded-xl space-y-1.5 shadow-sm text-xs">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <span className="font-extrabold text-brand-forest block">
+                              {rev.reviewer_name}
+                            </span>
+                            <span className="text-[10px] text-brand-muted-text/80">
+                              {new Date(rev.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex text-amber-500 gap-0.5">
+                            {Array.from({ length: 5 }).map((_, i) => (
+                              <svg key={i} className={`w-3.5 h-3.5 ${i < rev.rating ? "fill-current" : "stroke-current fill-none"}`} viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                            ))}
+                          </div>
+                        </div>
+                        <p className="text-brand-muted-text leading-relaxed">
+                          {rev.comment}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

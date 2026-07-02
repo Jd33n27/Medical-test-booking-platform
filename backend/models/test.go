@@ -12,6 +12,8 @@ type Test struct {
 	SampleType      string    `json:"sample_type"`
 	CreatedAt       time.Time `json:"created_at"`
 
-	// Joined field from labs table for response representation
-	LabName string `json:"lab_name,omitempty"`
+	// Joined fields from labs table for response representation
+	LabName       string  `json:"lab_name,omitempty"`
+	AverageRating float64 `json:"average_rating"`
+	NumRatings    int     `json:"num_ratings"`
 }

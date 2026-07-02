@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/google/uuid"
 )
 
 // GetTests fetches all tests, optionally filtered by lab_id, search query, or health_concern_id
@@ -18,9 +19,18 @@ func GetTests(c fiber.Ctx) error {
 	healthConcernID := c.Query("health_concern_id")
 
 	query := `
-		SELECT t.id, t.lab_id, t.test_name, t.description, t.price_naira, t.turnaround_hours, t.sample_type, t.created_at, l.name as lab_name
+		SELECT 
+			t.id, t.lab_id, t.test_name, t.description, t.price_naira, t.turnaround_hours, t.sample_type, t.created_at, 
+			l.name as lab_name,
+			COALESCE(r.avg_rating, 0.0) as average_rating,
+			COALESCE(r.num_ratings, 0) as num_ratings
 		FROM tests t
 		JOIN labs l ON t.lab_id = l.id
+		LEFT JOIN (
+			SELECT lab_id, AVG(rating) as avg_rating, COUNT(*) as num_ratings
+			FROM reviews
+			GROUP BY lab_id
+		) r ON t.lab_id = r.lab_id
 	`
 	args := []interface{}{}
 	whereClauses := []string{"1=1"}
@@ -68,6 +78,8 @@ func GetTests(c fiber.Ctx) error {
 			&t.SampleType,
 			&t.CreatedAt,
 			&t.LabName,
+			&t.AverageRating,
+			&t.NumRatings,
 		)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{
@@ -86,6 +98,36 @@ func GetTests(c fiber.Ctx) error {
 		"error":     nil,
 		"timestamp": time.Now().Format(time.RFC3339),
 	})
+}
+
+// Helper to ensure time slots exist for the next 7 days for a given lab
+func ensureSlotsExist(labID string) error {
+	times := []string{
+		"08:00:00",
+		"09:00:00",
+		"10:00:00",
+		"11:00:00",
+		"13:00:00",
+		"14:00:00",
+		"15:00:00",
+		"16:00:00",
+	}
+	now := time.Now()
+	for i := 0; i < 7; i++ {
+		dateStr := now.AddDate(0, 0, i).Format("2006-01-02")
+		for _, slotTime := range times {
+			id := uuid.New().String()
+			query := `
+				INSERT INTO time_slots (id, lab_id, slot_date, slot_time, capacity, booked)
+				VALUES (?, ?, ?, ?, ?, ?)
+				ON DUPLICATE KEY UPDATE id=id`
+			_, err := db.DB.Exec(query, id, labID, dateStr, slotTime, 10, 0)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // GetTestSlots returns available time slots for a specific test (next 7 days)
@@ -116,6 +158,17 @@ func GetTestSlots(c fiber.Ctx) error {
 			"success":   false,
 			"data":      nil,
 			"error":     "Database error looking up test",
+			"timestamp": time.Now().Format(time.RFC3339),
+		})
+	}
+
+	// Automatically ensure slots exist for this lab for the next 7 days
+	err = ensureSlotsExist(labID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success":   false,
+			"data":      nil,
+			"error":     fmt.Sprintf("Failed to auto-generate slots: %v", err),
 			"timestamp": time.Now().Format(time.RFC3339),
 		})
 	}
@@ -161,8 +214,8 @@ func GetTestSlots(c fiber.Ctx) error {
 			available = 0
 		}
 
-		// Only show slots that are not fully booked
-		if available > 0 {
+		// Return all slots (available >= 0), as front-end needs to display grayed-out slots with 0 available slots.
+		if available >= 0 {
 			formattedTime := formatTimeLabel(slotTimeStr)
 			formattedDate := slotDate.Format("2006-01-02")
 			dayOfWeek := slotDate.Format("Monday")

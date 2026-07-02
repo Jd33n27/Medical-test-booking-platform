@@ -29,12 +29,10 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({ test, slot, 
       setPromoError(null);
       const promoData = await api.validatePromo(promoCodeInput.trim().toUpperCase());
       setAppliedPromo(promoData);
-      bookingData.promo_code = promoData.code;
     } catch (err: any) {
       console.error(err);
       setPromoError(err?.response?.data?.error || err.message || 'Promo code is invalid.');
       setAppliedPromo(null);
-      bookingData.promo_code = null;
     } finally {
       setPromoLoading(false);
     }
@@ -44,7 +42,6 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({ test, slot, 
     setAppliedPromo(null);
     setPromoCodeInput('');
     setPromoError(null);
-    bookingData.promo_code = null;
   };
 
   // Calculate discount and final amount
@@ -63,7 +60,10 @@ export const ConfirmationPage: React.FC<ConfirmationPageProps> = ({ test, slot, 
       setSubmitting(true);
       setError(null);
       
-      const response = await api.createBooking(bookingData);
+      const response = await api.createBooking({
+        ...bookingData,
+        promo_code: appliedPromo?.code || null,
+      });
       
       // Redirect to Flutterwave checkout
       if (response.flutterwave_link) {

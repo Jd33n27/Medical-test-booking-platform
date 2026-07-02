@@ -342,7 +342,7 @@ func GetPatientBookings(c fiber.Ctx) error {
 	userID := c.Locals("user_id").(string)
 
 	query := `
-		SELECT b.id, b.payment_status, ts.slot_date, ts.slot_time, t.test_name, l.name, l.address, b.result_ready, b.result_file_url, b.total_price_naira, b.created_at, l.id AS lab_id
+		SELECT b.id, b.payment_status, ts.slot_date, ts.slot_time, t.test_name, l.name, l.address, b.result_ready, b.result_file_url, b.total_price_naira, b.created_at, l.id AS lab_id, b.home_collection, b.collection_address, b.test_id
 		FROM bookings b
 		JOIN tests t ON b.test_id = t.id
 		JOIN time_slots ts ON b.time_slot_id = ts.id
@@ -360,18 +360,21 @@ func GetPatientBookings(c fiber.Ctx) error {
 	defer rows.Close()
 
 	type HistoryItem struct {
-		ID              string    `json:"booking_id"`
-		Status          string    `json:"status"`
-		AppointmentDate string    `json:"appointment_date"`
-		AppointmentTime string    `json:"appointment_time"`
-		TestName        string    `json:"test_name"`
-		LabName         string    `json:"lab_name"`
-		LabAddress      string    `json:"lab_address"`
-		ResultReady     bool      `json:"result_ready"`
-		ResultFileURL   *string   `json:"result_file_url,omitempty"`
-		TotalPriceNaira float64   `json:"total_price_naira"`
-		CreatedAt       time.Time `json:"created_at"`
-		LabID           string    `json:"lab_id"`
+		ID                string    `json:"booking_id"`
+		Status            string    `json:"status"`
+		AppointmentDate   string    `json:"appointment_date"`
+		AppointmentTime   string    `json:"appointment_time"`
+		TestName          string    `json:"test_name"`
+		LabName           string    `json:"lab_name"`
+		LabAddress        string    `json:"lab_address"`
+		ResultReady       bool      `json:"result_ready"`
+		ResultFileURL     *string   `json:"result_file_url,omitempty"`
+		TotalPriceNaira   float64   `json:"total_price_naira"`
+		CreatedAt         time.Time `json:"created_at"`
+		LabID             string    `json:"lab_id"`
+		HomeCollection    bool      `json:"home_collection"`
+		CollectionAddress *string   `json:"collection_address,omitempty"`
+		TestID            string    `json:"test_id"`
 	}
 
 	history := []HistoryItem{}
@@ -380,6 +383,7 @@ func GetPatientBookings(c fiber.Ctx) error {
 		var slotDate time.Time
 		var slotTimeStr string
 		var resFile sql.NullString
+		var colAddr sql.NullString
 
 		err = rows.Scan(
 			&item.ID,
@@ -394,6 +398,9 @@ func GetPatientBookings(c fiber.Ctx) error {
 			&item.TotalPriceNaira,
 			&item.CreatedAt,
 			&item.LabID,
+			&item.HomeCollection,
+			&colAddr,
+			&item.TestID,
 		)
 		if err != nil {
 			return c.Status(500).JSON(fiber.Map{
@@ -407,6 +414,9 @@ func GetPatientBookings(c fiber.Ctx) error {
 		if resFile.Valid {
 			item.ResultFileURL = &resFile.String
 		}
+		if colAddr.Valid {
+			item.CollectionAddress = &colAddr.String
+		}
 
 		history = append(history, item)
 	}
@@ -414,5 +424,224 @@ func GetPatientBookings(c fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"success": true,
 		"data":    history,
+	})
+}
+
+// CancelAppointment updates booking status to cancelled and frees up the slot capacity
+func CancelAppointment(c fiber.Ctx) error {
+	userID := c.Locals("user_id").(string)
+	bookingID := c.Params("booking_id")
+	if bookingID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Booking ID is required",
+		})
+	}
+
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to start transaction",
+		})
+	}
+	defer tx.Rollback()
+
+	// 1. Fetch booking details to get the time slot ID and check if it's already cancelled
+	var slotID, paymentStatus string
+	err = tx.QueryRow("SELECT time_slot_id, payment_status FROM bookings WHERE id = ? AND user_id = ?", bookingID, userID).Scan(&slotID, &paymentStatus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.Status(404).JSON(fiber.Map{
+				"success": false,
+				"error":   "Booking not found",
+			})
+		}
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Database error checking booking details",
+		})
+	}
+
+	if paymentStatus == "cancelled" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Booking is already cancelled",
+		})
+	}
+
+	// 2. Update booking status to cancelled
+	_, err = tx.Exec("UPDATE bookings SET payment_status = 'cancelled' WHERE id = ?", bookingID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to cancel booking",
+		})
+	}
+
+	// 3. Decrement booked count on the time slot
+	_, err = tx.Exec("UPDATE time_slots SET booked = CASE WHEN booked > 0 THEN booked - 1 ELSE 0 END WHERE id = ?", slotID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to release slot capacity",
+		})
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to commit transaction",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Appointment cancelled successfully",
+	})
+}
+
+// RescheduleAppointment changes the time slot for an appointment
+func RescheduleAppointment(c fiber.Ctx) error {
+	userID := c.Locals("user_id").(string)
+	bookingID := c.Params("booking_id")
+	if bookingID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Booking ID is required",
+		})
+	}
+
+	type RescheduleRequest struct {
+		TimeSlotID string `json:"time_slot_id"`
+	}
+
+	var req RescheduleRequest
+	if err := c.Bind().Body(&req); err != nil || req.TimeSlotID == "" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Invalid request body or time_slot_id missing",
+		})
+	}
+
+	tx, err := db.DB.Begin()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to start transaction",
+		})
+	}
+	defer tx.Rollback()
+
+	// 1. Fetch old booking details (test_id, old slot_id, status)
+	var testID, oldSlotID, paymentStatus string
+	err = tx.QueryRow("SELECT test_id, time_slot_id, payment_status FROM bookings WHERE id = ? AND user_id = ?", bookingID, userID).Scan(&testID, &oldSlotID, &paymentStatus)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.Status(404).JSON(fiber.Map{
+				"success": false,
+				"error":   "Booking not found",
+			})
+		}
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Database error checking booking details",
+		})
+	}
+
+	if paymentStatus == "cancelled" {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Cannot reschedule a cancelled appointment",
+		})
+	}
+
+	if oldSlotID == req.TimeSlotID {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Appointment is already scheduled for this slot",
+		})
+	}
+
+	// 2. Fetch test details (lab_id)
+	var testLabID string
+	err = tx.QueryRow("SELECT lab_id FROM tests WHERE id = ?", testID).Scan(&testLabID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Database error checking test details",
+		})
+	}
+
+	// 3. Verify and lock the new slot (check lab_id, capacity)
+	var newSlotLabID string
+	var capacity, booked int
+	err = tx.QueryRow("SELECT lab_id, capacity, booked FROM time_slots WHERE id = ? FOR UPDATE", req.TimeSlotID).Scan(&newSlotLabID, &capacity, &booked)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return c.Status(404).JSON(fiber.Map{
+				"success": false,
+				"error":   "New time slot not found",
+			})
+		}
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Database error checking new slot details",
+		})
+	}
+
+	if testLabID != newSlotLabID {
+		return c.Status(400).JSON(fiber.Map{
+			"success": false,
+			"error":   "Time slot does not belong to the lab offering this test",
+		})
+	}
+
+	if booked >= capacity {
+		return c.Status(409).JSON(fiber.Map{
+			"success": false,
+			"error":   "Selected time slot is fully booked",
+		})
+	}
+
+	// 4. Update old slot (decrement booked)
+	_, err = tx.Exec("UPDATE time_slots SET booked = CASE WHEN booked > 0 THEN booked - 1 ELSE 0 END WHERE id = ?", oldSlotID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to release old slot capacity",
+		})
+	}
+
+	// 5. Update new slot (increment booked)
+	_, err = tx.Exec("UPDATE time_slots SET booked = booked + 1 WHERE id = ?", req.TimeSlotID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to reserve new slot capacity",
+		})
+	}
+
+	// 6. Update booking with the new time slot
+	_, err = tx.Exec("UPDATE bookings SET time_slot_id = ? WHERE id = ?", req.TimeSlotID, bookingID)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to update booking time slot",
+		})
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{
+			"success": false,
+			"error":   "Failed to commit transaction",
+		})
+	}
+
+	return c.JSON(fiber.Map{
+		"success": true,
+		"message": "Appointment rescheduled successfully",
 	})
 }

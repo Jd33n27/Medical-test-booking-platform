@@ -95,8 +95,17 @@ func OnboardLab(c fiber.Ctx) error {
 		}
 	}
 
-	// 3. Auto-seed time slots for next 7 days, 3 slots per day (9 AM, 12 PM, 3 PM), capacity 10
-	times := []string{"09:00:00", "12:00:00", "15:00:00"}
+	// 3. Auto-seed time slots for next 7 days, slots from 8 AM to 4 PM (excluding 12 PM), capacity 10
+	times := []string{
+		"08:00:00",
+		"09:00:00",
+		"10:00:00",
+		"11:00:00",
+		"13:00:00",
+		"14:00:00",
+		"15:00:00",
+		"16:00:00",
+	}
 	now := time.Now()
 	for i := 0; i < 7; i++ {
 		dateStr := now.AddDate(0, 0, i).Format("2006-01-02")

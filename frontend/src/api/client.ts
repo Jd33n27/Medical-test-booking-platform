@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { 
   Lab, Test, TestSlotsResponse, BookingRequest, BookingResponse, BookingStatus, APIResponse,
-  User, LoginRequest, RegisterRequest, AuthResponse, BookingHistoryItem, HealthConcern
+  User, LoginRequest, RegisterRequest, AuthResponse, BookingHistoryItem, HealthConcern, Review
 } from '../types';
 
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 
@@ -110,6 +110,24 @@ export const api = {
       throw new Error(response.data.error || 'Failed to fetch booking history log');
     }
     return response.data.data;
+  },
+
+  // Cancel an appointment
+  async cancelAppointment(bookingId: string): Promise<any> {
+    const response = await client.put<APIResponse<any>>(`/api/appointments/${bookingId}/cancel`);
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to cancel appointment');
+    }
+    return response.data;
+  },
+
+  // Reschedule an appointment
+  async rescheduleAppointment(bookingId: string, timeSlotId: string): Promise<any> {
+    const response = await client.put<APIResponse<any>>(`/api/appointments/${bookingId}/reschedule`, { time_slot_id: timeSlotId });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to reschedule appointment');
+    }
+    return response.data;
   },
 
   // Fetch all bookings assigned to the active lab admin's laboratory
@@ -235,8 +253,15 @@ export const api = {
     return response.data.data;
   },
 
-  // Update authenticated user profile name & email
-  async updateProfile(profileData: { name: string; email: string }): Promise<User> {
+  // Update authenticated user profile details and health vitals
+  async updateProfile(profileData: { 
+    name: string; 
+    email: string; 
+    blood_pressure?: string; 
+    blood_sugar?: number; 
+    height_cm?: number; 
+    weight_kg?: number; 
+  }): Promise<User> {
     const response = await client.put<APIResponse<User>>('/api/auth/profile', profileData);
     if (!response.data.success) {
       throw new Error(response.data.error || 'Failed to update profile details');
@@ -249,6 +274,33 @@ export const api = {
     const response = await client.post<APIResponse<User>>('/api/auth/profile/verify', verificationData);
     if (!response.data.success) {
       throw new Error(response.data.error || 'Failed to submit verification details');
+    }
+    return response.data.data;
+  },
+
+  // Fetch reviews for a specific lab
+  async getLabReviews(labId: string): Promise<Review[]> {
+    const response = await client.get<APIResponse<Review[]>>(`/api/labs/${labId}/reviews`);
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to fetch lab reviews');
+    }
+    return response.data.data;
+  },
+
+  // Submit a review for a specific lab
+  async submitLabReview(labId: string, rating: number, reviewerName: string, comment: string): Promise<Review> {
+    const response = await client.post<APIResponse<Review>>(`/api/labs/${labId}/reviews`, { rating, reviewer_name: reviewerName, comment });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to submit lab review');
+    }
+    return response.data.data;
+  },
+
+  // Geocode address query via backend proxy
+  async geocode(query: string): Promise<any[]> {
+    const response = await client.get<APIResponse<any[]>>('/api/geocode', { params: { q: query } });
+    if (!response.data.success) {
+      throw new Error(response.data.error || 'Failed to geocode address');
     }
     return response.data.data;
   },

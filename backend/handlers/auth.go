@@ -261,13 +261,17 @@ func GetProfile(c fiber.Ctx) error {
 	})
 }
 
-// UpdateProfile updates the name and email of the user
+// UpdateProfile updates the name, email, and health vitals of the user
 func UpdateProfile(c fiber.Ctx) error {
 	userID := c.Locals("user_id").(string)
 
 	type UpdateReq struct {
-		Name  string `json:"name"`
-		Email string `json:"email"`
+		Name          string   `json:"name"`
+		Email         string   `json:"email"`
+		BloodPressure *string  `json:"blood_pressure"`
+		BloodSugar    *int     `json:"blood_sugar"`
+		HeightCm      *float64 `json:"height_cm"`
+		WeightKg      *float64 `json:"weight_kg"`
 	}
 
 	var req UpdateReq
@@ -308,8 +312,9 @@ func UpdateProfile(c fiber.Ctx) error {
 		})
 	}
 
-	// Update user info
-	_, err = db.DB.Exec("UPDATE users SET name = ?, email = ? WHERE id = ?", req.Name, req.Email, userID)
+	// Update user info including health profile vitals
+	query := "UPDATE users SET name = ?, email = ?, blood_pressure = ?, blood_sugar = ?, height_cm = ?, weight_kg = ? WHERE id = ?"
+	_, err = db.DB.Exec(query, req.Name, req.Email, req.BloodPressure, req.BloodSugar, req.HeightCm, req.WeightKg, userID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"success": false,
@@ -409,9 +414,13 @@ func fetchUserProfile(userID string) (models.User, error) {
 	var labName, labAddress, labCity, labState, labPhone sql.NullString
 	var labLat, labLng sql.NullFloat64
 	var labHomeCol sql.NullBool
+	var bp sql.NullString
+	var bs sql.NullInt64
+	var hc, wk sql.NullFloat64
 
 	query := `
 		SELECT u.id, u.name, u.email, u.role, u.lab_id, u.verification_status, u.license_number, u.id_number, u.verification_document, u.created_at,
+		       u.blood_pressure, u.blood_sugar, u.height_cm, u.weight_kg,
 		       l.name as lab_name, l.address as lab_address, l.city as lab_city, l.state as lab_state, l.phone as lab_phone,
 		       l.latitude as lab_latitude, l.longitude as lab_longitude, l.accepts_home_collection as lab_accepts_home_collection
 		FROM users u
@@ -429,6 +438,10 @@ func fetchUserProfile(userID string) (models.User, error) {
 		&idNumber,
 		&verificationDocument,
 		&user.CreatedAt,
+		&bp,
+		&bs,
+		&hc,
+		&wk,
 		&labName,
 		&labAddress,
 		&labCity,
@@ -454,6 +467,19 @@ func fetchUserProfile(userID string) (models.User, error) {
 	}
 	if verificationDocument.Valid {
 		user.VerificationDocument = &verificationDocument.String
+	}
+	if bp.Valid {
+		user.BloodPressure = &bp.String
+	}
+	if bs.Valid {
+		val := int(bs.Int64)
+		user.BloodSugar = &val
+	}
+	if hc.Valid {
+		user.HeightCm = &hc.Float64
+	}
+	if wk.Valid {
+		user.WeightKg = &wk.Float64
 	}
 	if labName.Valid {
 		user.LabName = &labName.String

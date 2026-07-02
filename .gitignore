@@ -31,3 +31,5 @@ Thumbs.db
 # User Uploads
 backend/uploads/
 
+# Figma Design Folder
+figma_design/

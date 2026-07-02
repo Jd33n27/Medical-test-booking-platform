@@ -14,6 +14,11 @@ type User struct {
 	IDNumber             *string    `json:"id_number,omitempty"`
 	VerificationDocument *string    `json:"verification_document,omitempty"`
 	CreatedAt            time.Time  `json:"created_at"`
+	// Health Profile Vitals
+	BloodPressure        *string    `json:"blood_pressure,omitempty"`
+	BloodSugar           *int       `json:"blood_sugar,omitempty"`
+	HeightCm             *float64   `json:"height_cm,omitempty"`
+	WeightKg             *float64   `json:"weight_kg,omitempty"`
 	// Linked Laboratory profile details (automatically fetched if role is lab_admin and lab_id is set)
 	LabName                 *string  `json:"lab_name,omitempty"`
 	LabAddress              *string  `json:"lab_address,omitempty"`

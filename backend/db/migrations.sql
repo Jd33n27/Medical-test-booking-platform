@@ -71,6 +71,10 @@ CREATE TABLE IF NOT EXISTS users (
   role VARCHAR(50) DEFAULT 'patient', -- patient, lab_admin, platform_admin
   lab_id VARCHAR(36) NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  blood_pressure VARCHAR(20) NULL,
+  blood_sugar INT NULL,
+  height_cm DOUBLE NULL,
+  weight_kg DOUBLE NULL,
   FOREIGN KEY (lab_id) REFERENCES labs(id) ON DELETE SET NULL
 );
 
@@ -90,5 +94,18 @@ CREATE TABLE IF NOT EXISTS test_health_concerns (
   PRIMARY KEY (test_id, health_concern_id),
   FOREIGN KEY (test_id) REFERENCES tests(id) ON DELETE CASCADE,
   FOREIGN KEY (health_concern_id) REFERENCES health_concerns(id) ON DELETE CASCADE
+);
+
+-- REVIEWS TABLE
+CREATE TABLE IF NOT EXISTS reviews (
+  id VARCHAR(36) PRIMARY KEY,
+  lab_id VARCHAR(36) NOT NULL,
+  user_id VARCHAR(36) NULL,
+  rating INT NOT NULL,
+  reviewer_name VARCHAR(255) NOT NULL,
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (lab_id) REFERENCES labs(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 

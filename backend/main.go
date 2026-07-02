@@ -40,11 +40,16 @@ func main() {
 	// Labs (Public listings)
 	api.Get("/labs", handlers.GetLabs)
 	api.Get("/labs/list", handlers.GetLabsList)
+	api.Get("/geocode", handlers.GeocodeAddress)
 
 	// Tests & Slots (Public catalog)
 	api.Get("/tests", handlers.GetTests)
 	api.Get("/tests/:test_id/slots", handlers.GetTestSlots)
 	api.Get("/health-concerns", handlers.GetHealthConcerns)
+
+	// Reviews
+	api.Get("/labs/:lab_id/reviews", handlers.GetLabReviews)
+	api.Post("/labs/:lab_id/reviews", middleware.RequireAuth, handlers.SubmitLabReview)
 
 
 	// Bookings & Payments (Core flow)
@@ -66,6 +71,9 @@ func main() {
 
 	// Bookings History (Patient portal)
 	api.Get("/bookings", middleware.RequireAuth, handlers.GetPatientBookings)
+	api.Get("/appointments", middleware.RequireAuth, handlers.GetPatientBookings)
+	api.Put("/appointments/:booking_id/cancel", middleware.RequireAuth, handlers.CancelAppointment)
+	api.Put("/appointments/:booking_id/reschedule", middleware.RequireAuth, handlers.RescheduleAppointment)
 
 	// Chat Messaging (Telegram-style patient/lab chats)
 	api.Get("/chats/threads", middleware.RequireAuth, handlers.GetChatThreads)

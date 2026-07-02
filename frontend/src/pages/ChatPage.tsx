@@ -122,6 +122,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
     };
 
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, initialLabId, initialPatientId]);
 
   // 3. Fetch messages for active thread + mark as read
@@ -212,6 +213,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
         window.clearInterval(pollingRef.current);
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeThreadId]);
 
   // 6. Send message handler
@@ -294,7 +296,7 @@ export const ChatPage: React.FC<ChatPageProps> = ({ onBack, initialLabId, initia
   };
 
   return (
-    <div className="h-[calc(100vh-140px)] flex flex-col md:flex-row md:rounded-2xl md:bento-panel-light overflow-hidden shadow-none md:shadow-sm">
+    <div className="h-[calc(100dvh-140px)] flex flex-col md:flex-row md:rounded-2xl md:bento-panel-light overflow-hidden shadow-none md:shadow-sm">
       {/* Sidebar - Threads list */}
       <aside className={`w-full md:w-80 border-r border-brand-border flex flex-col h-full bg-brand-cream/60 ${activeThreadId ? 'hidden md:flex' : 'flex'}`}>
         {/* Sidebar Header */}

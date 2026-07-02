@@ -99,14 +99,8 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
 
     searchTimeoutRef.current = setTimeout(async () => {
       try {
-        const query = encodeURIComponent(val);
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${query}&addressdetails=1&countrycodes=ng&limit=5`
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setSuggestions(data || []);
-        }
+        const data = await api.geocode(val);
+        setSuggestions(data || []);
       } catch (err) {
         console.error("Autocomplete search failed:", err);
       } finally {
@@ -164,16 +158,12 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
       latVal = detectedCoords.lat;
       lngVal = detectedCoords.lng;
     } else {
-      // Run quick synchronous search in submit if no lookup was run manually
+      // Run quick search in submit if no lookup was run manually
       try {
-        const query = encodeURIComponent(`${address}, ${city}, ${state}, Nigeria`);
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&limit=1`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.length > 0) {
-            latVal = parseFloat(data[0].lat);
-            lngVal = parseFloat(data[0].lon);
-          }
+        const data = await api.geocode(`${address}, ${city}, ${state}, Nigeria`);
+        if (data && data.length > 0) {
+          latVal = parseFloat(data[0].lat);
+          lngVal = parseFloat(data[0].lon);
         }
       } catch (err) {
         console.log("Inline geocoding failed, falling back to Lagos coordinates:", err);
@@ -207,7 +197,7 @@ export const OnboardLabPage: React.FC<OnboardLabPageProps> = ({ onSuccess, onBac
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 my-8 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-4 my-8 animate-fade-in relative overflow-hidden">
       {/* Background glow highlights */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-brand-forest/5 blur-[120px] rounded-full pointer-events-none -z-10" />
       <div className="absolute top-1/3 left-1/3 w-60 h-60 bg-brand-terracotta/5 blur-[100px] rounded-full pointer-events-none -z-10" />
