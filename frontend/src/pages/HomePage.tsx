@@ -633,7 +633,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 {processedTests.map((test) => (
                   <div
                     key={test.id}
-                    className="group relative flex flex-col justify-between p-4 rounded-[16px] border-2 border-brand-border-dark/30 bento-panel-light transition-all duration-200 w-full sm:w-[286px] min-h-[266px] sm:h-[266px] shrink-0"
+                    className="group relative flex flex-col justify-between p-4 rounded-2xlborder-2 border-brand-border-dark/30 bento-panel-light transition-all duration-200 w-full sm:w-66.5 min-h-66.5 sm:h-66.5 shrink-0"
                   >
                     <div className="flex flex-col justify-between h-full space-y-2">
                       {/* Header */}
@@ -706,7 +706,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                       <div className="pt-2 border-t border-brand-border/60 flex gap-2">
                         <button
                           onClick={() => onSelectTest(test)}
-                          className="flex-grow flex items-center justify-center gap-1.5 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text font-bold py-2.5 px-3 rounded-xl transition-all duration-200 cursor-pointer text-xs"
+                          className="grow flex items-center justify-center gap-1.5 bg-brand-terracotta hover:bg-brand-terracotta-hover text-brand-light-text font-bold py-2.5 px-3 rounded-xl transition-all duration-200 cursor-pointer text-xs"
                         >
                           Book Appointment
                           <svg

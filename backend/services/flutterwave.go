@@ -42,13 +42,14 @@ type FlutterwaveResponse struct {
 // InitiatePayment generates a Flutterwave checkout link.
 // It will attempt to call the real Flutterwave API if FLUTTERWAVE_SECRET_KEY is configured,
 // otherwise it falls back to a sandbox/mock checkout redirect for development.
-func InitiatePayment(amount float64, bookingID string, email string, name string, phone string) (string, error) {
+// requestBaseURL should be the scheme+host derived from the incoming HTTP request (e.g. "https://example.com").
+func InitiatePayment(amount float64, bookingID string, email string, name string, phone string, requestBaseURL string) (string, error) {
 	bypassPayment := os.Getenv("BYPASS_PAYMENT")
 	secretKey := os.Getenv("FLUTTERWAVE_SECRET_KEY")
 	if bypassPayment == "true" || secretKey == "" || secretKey == "FLWSECK_TEST-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-X" {
 		backendURL := os.Getenv("BACKEND_URL")
 		if backendURL == "" {
-			backendURL = "http://localhost:5000"
+			backendURL = requestBaseURL
 		}
 		return fmt.Sprintf("%s/api/bookings/%s/mock-pay", backendURL, bookingID), nil
 	}

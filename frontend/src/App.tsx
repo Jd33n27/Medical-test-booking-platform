@@ -357,7 +357,7 @@ function App() {
         {/* Mobile Sidebar Overlay */}
         {dashboardSidebarOpen && (
           <div
-            className="fixed inset-0 bg-[#1A3026]/40 backdrop-blur-xs z-40 lg:hidden animate-fadeIn"
+            className="fixed inset-0 bg-brand-forest/40 backdrop-blur-xs z-40 lg:hidden animate-fadeIn"
             onClick={() => setDashboardSidebarOpen(false)}
           />
         )}

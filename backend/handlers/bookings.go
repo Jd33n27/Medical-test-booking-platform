@@ -225,7 +225,8 @@ func CreateBooking(c fiber.Ctx) error {
 	}
 
 	// 6. Generate Flutterwave payment link
-	flwLink, err := services.InitiatePayment(totalPrice, bookingID, req.PatientEmail, req.PatientName, req.PatientPhone)
+	requestBaseURL := c.Protocol() + "://" + c.Hostname()
+	flwLink, err := services.InitiatePayment(totalPrice, bookingID, req.PatientEmail, req.PatientName, req.PatientPhone, requestBaseURL)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{
 			"success":   false,

@@ -93,34 +93,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
   );
   const completedBookings = history.filter((b) => b.result_ready).slice(0, 2);
 
-  // Fallback mock data if none exists in database
-  const mockUpcoming = {
-    test_name: "Comprehensive Health Panel",
-    lab_name: "Synlab Diagnostics",
-    appointment_date: "2026-07-02T08:00:00.000Z", // Tomorrow (relative to frozen baseline)
-    appointment_time: "08:00 AM - 09:00 AM",
-    home_collection: true,
-    collection_address: "123 Victoria Island, Lagos",
-  };
 
-  const mockCompleted = [
-    {
-      booking_id: "REF-1",
-      test_name: "Lipid Profile",
-      lab_name: "Synlab Diagnostics",
-      created_at: "2026-06-15T10:00:00Z",
-      status: "Normal",
-      result_file_url: "#",
-    },
-    {
-      booking_id: "REF-2",
-      test_name: "Complete Blood Count",
-      lab_name: "MeCure Healthcare",
-      created_at: "2026-06-05T09:30:00Z",
-      status: "Needs Review",
-      result_file_url: "#",
-    },
-  ];
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -130,12 +103,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
 
         <div className="relative z-10 space-y-2 max-w-xl">
           <h2 className="text-xl sm:text-2xl font-black flex items-center gap-2">
-            Good morning, {user.name.split(" ")[0]}! 📋
+            Good morning, {user.name.split(" ")[0]}!
           </h2>
           <p className="text-white/80 text-xs sm:text-sm leading-relaxed">
             {upcomingBooking
-              ? `You have an upcoming ${upcomingBooking.home_collection ? "home sample collection" : "clinic visit"} tomorrow. Please ensure you fast for 8 hours prior to the collection time.`
-              : "You have an upcoming home sample collection tomorrow. Please ensure you fast for 8 hours prior to the collection time."}
+              ? `You have an upcoming ${upcomingBooking.home_collection ? "home sample collection" : "clinic visit"}. Please ensure you follow any preparation instructions before your appointment.`
+              : "Welcome to your health dashboard. Book your first diagnostic test to get started on your wellness journey."}
           </p>
         </div>
       </section>
@@ -158,6 +131,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
               </button>
             </div>
 
+            {upcomingBooking ? (
             <div className="bg-white border border-[#EAE3D5] rounded-2xl p-6 space-y-5 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-[#D26E4F]/10 text-[#D26E4F] flex items-center justify-center shrink-0">
@@ -178,20 +152,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
                 <div className="space-y-1 w-full">
                   <div className="flex items-center w-full justify-between">
                     <h4 className="font-extrabold text-base text-[#1F3A2B]">
-                      {upcomingBooking
-                        ? upcomingBooking.test_name
-                        : mockUpcoming.test_name}
+                      {upcomingBooking.test_name}
                     </h4>
                     <span className="bg-[#ED6C02]/10 text-[#ED6C02] border border-[#EAE3D5] text-sm font-bold px-2.5 py-1 rounded-full">
-                      Tomorrow
+                      Upcoming
                     </span>
                   </div>
                   <span className="text-xs text-brand-muted-text block">
-                    {upcomingBooking
-                      ? upcomingBooking.home_collection
-                        ? "Home Sample Collection"
-                        : "Clinic Visit"
-                      : "Home Sample Collection"}
+                    {upcomingBooking.home_collection
+                      ? "Home Sample Collection"
+                      : "Clinic Visit"}
                   </span>
                 </div>
               </div>
@@ -211,11 +181,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
                       d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                     />
                   </svg>
-                  <span>
-                    {upcomingBooking
-                      ? upcomingBooking.appointment_time
-                      : mockUpcoming.appointment_time}
-                  </span>
+                  <span>{upcomingBooking.appointment_time}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <svg
@@ -238,10 +204,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
                     />
                   </svg>
                   <span className="truncate">
-                    {upcomingBooking
-                      ? upcomingBooking.collection_address ||
-                        upcomingBooking.lab_name
-                      : mockUpcoming.collection_address}
+                    {upcomingBooking.collection_address ||
+                      upcomingBooking.lab_name}
                   </span>
                 </div>
               </div>
@@ -257,7 +221,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
                     Reschedule
                   </button>
                   <button
-                    onClick={() => setPreparingBooking(upcomingBooking || mockUpcoming)}
+                    onClick={() => setPreparingBooking(upcomingBooking)}
                     className="grow py-2.5 px-4 bg-[#1F3A2B] hover:bg-[#15271D] text-white text-sm rounded-xl transition-all cursor-pointer"
                   >
                     Prepare for Test
@@ -265,6 +229,27 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
                 </div>
               </div>
             </div>
+            ) : (
+            <div className="bg-white border border-[#EAE3D5] border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center space-y-4 shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-[#FAF6F0] text-brand-muted-text/40 flex items-center justify-center">
+                <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-[#1F3A2B]">No upcoming appointments</h4>
+                <p className="text-xs text-brand-muted-text leading-relaxed max-w-xs">
+                  Book a diagnostic test to see your next appointment details here.
+                </p>
+              </div>
+              <button
+                onClick={() => onNavigate("home")}
+                className="py-2.5 px-6 bg-[#1F3A2B] hover:bg-[#15271D] text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
+              >
+                Book a Test
+              </button>
+            </div>
+            )}
           </div>
 
           {/* Recent Results */}
@@ -323,71 +308,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
                       </div>
                     </div>
                   ))
-                : mockCompleted.map((b) => (
-                    <div
-                      key={b.booking_id}
-                      className="bg-white border border-[#EAE3D5] rounded-xl p-4 flex items-center justify-between gap-4 shadow-sm"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-[#FAF6F0] text-brand-muted-text flex items-center justify-center shrink-0">
-                          <svg
-                            className="w-5 h-5 text-brand-muted-text/80"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-brand-dark-text leading-tight">
-                            {b.test_name}
-                          </h4>
-                          <span className="text-[10px] text-brand-muted-text block mt-0.5">
-                            {b.lab_name} • Oct 12, 2023
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                            b.status === "Normal"
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
-                              : "bg-amber-50 text-amber-700 border border-amber-100"
-                          }`}
-                        >
-                          {b.status}
-                        </span>
-                        <button
-                          onClick={() =>
-                            alert(
-                              "Viewing Demo Diagnostic Report sheet. Real PDF downloads will be active for actual bookings.",
-                            )
-                          }
-                          className="p-1.5 rounded-lg border border-[#EAE3D5] text-[#1F3A2B] hover:bg-brand-sage/20 transition-all cursor-pointer"
-                        >
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2.2}
-                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                            />
-                          </svg>
-                        </button>
-                      </div>
+                : (
+                  <div className="bg-white border border-[#EAE3D5] border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center space-y-2">
+                    <div className="w-10 h-10 rounded-lg bg-[#FAF6F0] text-brand-muted-text/40 flex items-center justify-center">
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
                     </div>
-                  ))}
+                    <h4 className="text-xs font-bold text-[#1F3A2B]">No results yet</h4>
+                    <p className="text-[10px] text-brand-muted-text leading-relaxed max-w-55">
+                      Your completed test results and diagnostic reports will appear here.
+                    </p>
+                  </div>
+                )}
             </div>
           </div>
         </div>
@@ -533,7 +466,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }
 
       {/* Preparation Instructions Modal */}
       {preparingBooking && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A3026]/35 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-forest/35 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white border border-[#EAE3D5] rounded-3xl p-6 md:p-8 max-w-md w-full shadow-2xl animate-slideUp space-y-6">
             <div className="flex justify-between items-center pb-3 border-b border-[#FAF6F0]">
               <div>
